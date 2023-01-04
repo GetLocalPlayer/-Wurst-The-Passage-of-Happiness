@@ -1,0 +1,40 @@
+package Fire
+import NoWurst
+
+import Effect
+import MapBounds
+import Destructable
+import Unit
+import Region
+import Trigger
+import Group
+import ClosureForGroups
+import ClosureTimers
+
+
+let unitsOnFire = CreateGroup()
+
+
+init
+    let fireRegion = CreateRegion()
+    forDestructablesInRect(playableMapRect) d -> 
+        if d.getTypeId() == 'LTex'
+            addEffect("firepillarmedium.mdx", d.getPos())
+            fireRegion.addRect(d.getPos().withRadiusRect(32))
+            d.kill()
+     
+    CreateTrigger()..registerEnterRegion( fireRegion, Filter( ()->not unitsOnFire.contains(GetFilterUnit()) ) )
+    ..addAction() ->
+        let target = GetTriggerUnit()
+        let fireEffect = addEffect("firepillarmedium.mdx", target, "head")
+        unitsOnFire.addUnit(target)
+        doPeriodically(0.3) cb ->
+            target.damageTarget(target, target.getMaxHP() * 0.1)
+            if not target.isAlive()
+                unitsOnFire.removeUnit(target)
+                fireEffect.destr()
+                destroy cb 
+
+            
+            
+            

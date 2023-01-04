@@ -1,0 +1,41 @@
+package TimedMissile
+import NoWurst
+
+import public Missile
+
+
+public class TimedMissile extends Missile
+    /** Do not forget to use proper coords of the points which include terrain's Z or unit's Z. */
+    construct(unit owner, string model, vec3 start, vec3 finish, real duration)
+        super(owner, model, start, finish, 1.)
+        distance = duration
+        remain = duration
+    
+    /** Do not forget to use proper coords of the points which include terrain's Z or unit's Z. */
+    construct(unit owner, string model, vec3 start, vec3 finish, real duration, real trajectory)
+        super(owner, model, start, finish, 1., trajectory)
+        distance = duration
+        remain = duration
+
+    /** Do not forget to use proper coords of the points which include terrain's Z or unit's Z.
+    Height parameter means the height of the point that's in the centre of the missile's way
+    and through which this missile will pass. */
+    construct(unit owner, string model, vec3 start, real height, vec3 finish, real duration)
+        super(owner, model, start, height, finish, 1.)
+        distance = duration
+        remain = duration
+
+    /** Do not forget to use proper coords of the points which include terrain's Z or unit's Z.
+    Middle parameter means the point in the centre of the missile's path */
+    construct(unit owner, string model, vec3 start, vec3 mid, vec3 finish, real duration)
+        super(owner, model, start, mid, finish, 1.)
+        distance = duration
+        remain = duration
+
+    /* Override set functions to prevent any influence on the trick. */
+    override function setSpeed(real newSpeed)
+        skip
+
+    /* Overriden too just to be. */
+    override function getSpeed() returns real
+        return 0.

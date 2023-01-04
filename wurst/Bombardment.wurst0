@@ -1,0 +1,83 @@
+package Bombardment
+import NoWurst
+import Unit
+import Rect
+import ClosureForGroups
+import ClosureTimers
+import Trigger
+import EventHelper
+import Raycast
+
+import TimedMissile
+import ProtectiveField
+import Hero
+
+constant RADIUS = 250. // Bombardment zone radius
+constant SPEED = 250. // Bombardment movement
+
+let start = [gg_rct_RightStart.getCenter().withTerrainZ(), gg_rct_LeftStart.getCenter().withTerrainZ(), gg_rct_MidStart.getCenter().withTerrainZ(1000)]
+let finish = [gg_rct_RightFinish.getCenter().withTerrainZ(), gg_rct_LeftFinish.getCenter().withTerrainZ(), gg_rct_MidFinish.getCenter().withTerrainZ(1000)]
+let targetA = gg_rct_MidStart.getCenter().withTerrainZ()
+let targetB = gg_rct_MidFinish.getCenter().withTerrainZ()
+
+class Rocket extends TimedMissile
+    construct(vec3 start, vec3 finish)
+        super(null, "Abilities\\Weapons\\Mortar\\MortarMissile.mdl", start, 300, finish, 1.5)
+        enableSteering()
+        model.setScale(1.5)
+
+    override function actions(real delay)
+        if field != null 
+            let pen = field.penetrate(prevPos, pos)
+            if pen.success
+                model.setPos(vec3(-10000, -10000, -10000))
+                destroy this
+    
+    override function finalizer()
+        forUnitsInRange(pos.toVec2(), 150, (u)->begin
+            u.kill()
+        end)
+        model.setOrientation(0, 0, 0)
+        destroy this
+
+function initBombardment()
+    CallbackPeriodic initBomb = (initBomb)->begin
+        let choice = GetRandomInt(0, 2)
+        let heroPos = HERO.getPos3Real()
+        let ray = ray3d(targetA, targetA.normalizedPointerTo(targetB))
+        let proj = heroPos.project(ray)
+        if proj.distance <= targetA.distanceTo(targetB)
+            let a = start[choice]
+            let b = finish[choice]
+            let controlDist = SPEED * 5
+            var pos = proj.distance >= controlDist ? a.moveTowards(b, proj.distance - controlDist) : a
+            var target = proj.distance >= controlDist ? targetA.moveTowards(targetB, proj.distance - controlDist) : targetA
+            CallbackPeriodic bombardment = (bombardment)->begin
+                let offset = SPEED * TimerGetElapsed(GetExpiredTimer())
+                pos = pos.moveTowards(b, offset)
+                target = target.moveTowards(targetB, offset)
+                new Rocket(pos, target.offset2d(GetRandomReal(0, 360).asAngleDegrees(), GetRandomReal(-400, 400)))
+                if offset >= target.distanceTo(targetB)
+                    destroy bombardment
+            end
+            doPeriodically(0.15, bombardment)
+    end
+    doPeriodically(8, initBomb)
+
+init
+    CreateTrigger()
+    ..registerRectEnterEventSource(gg_rct_Checkpoint)
+    ..addAction(()->begin
+        initBombardment()
+        GetTriggeringTrigger().disable() 
+    end)
+
+    CreateTrigger()
+    ..registerRectEnterEventSource(gg_rct_Faster)
+    ..addAction(()->GetTriggerUnit().addAbility('A003'))
+    CreateTrigger()
+    ..registerRectLeaveEventSource(gg_rct_Faster)
+    ..addAction(()->GetTriggerUnit().removeAbility('A003'))
+    CreateTrigger()
+    ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+    ..addAction(()->GetTriggerUnit().removeAbility('A003'))

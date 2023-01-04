@@ -1,0 +1,9 @@
+---
+projectName: "RaycastExample"
+dependencies:
+- "https://github.com/wurstscript/wurstStdlib2"
+buildMapData:
+  name: "RaycastExample"
+  fileName: "RaycastExample"
+  author: "GetLocalPlayer"
+  playerCount: 1

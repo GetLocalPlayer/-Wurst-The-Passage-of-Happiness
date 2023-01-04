@@ -1,0 +1,31 @@
+package WurstExportedObjects_w3h
+import ObjEditingNatives
+
+// Modified Table (contains all custom objects)
+
+@compiletime function create_w3h_B000()
+	let def = createObjectDefinition("w3h", 'B000', 'Basl')
+	..setString("ftip", "It's too heavy!")
+	..setString("fube", "You're slowed.")
+	..setString("fart", "ReplaceableTextures\\CommandButtons\\BTNSpellShieldAmulet.blp")
+
+
+@compiletime function create_w3h_B001()
+	let def = createObjectDefinition("w3h", 'B001', 'Basl')
+	..setString("ftip", "|cFF20c000Hurry up!|r")
+	..setString("fube", "The end is at hand!")
+	..setString("fart", "ReplaceableTextures\\CommandButtons\\BTNBootsOfSpeed.blp")
+
+
+@compiletime function create_w3h_BM01()
+	let def = createObjectDefinition("w3h", 'BM01', 'BNss')
+	..setInt("wurs", 42)
+	..setString("fnam", "Shield Generator")
+	..setString("ftip", "Shield Generator")
+	..setString("fube", "It's too heavy!")
+
+
+// Original Table (contains all modified default objects)
+// Wurst does not support modifying default objects
+// but you can copy these functions and replace 'xxxx' with a new, custom id.
+

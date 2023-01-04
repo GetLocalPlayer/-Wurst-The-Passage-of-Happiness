@@ -1,0 +1,94 @@
+package Razor
+import ClosureTimers
+import ClosureForGroups
+import LinkedListModule
+import Raycast
+import Assets
+
+import Segment
+
+constant START_POS = gg_rct_RazorStart.getCenter()
+constant FINISH_POS = gg_rct_RazorFinish.getCenter()
+constant WIDTH = 1500.
+constant SPEED = 750.
+
+
+class Razor
+    use LinkedListModule
+    private vec2 p1
+    private vec2 p2
+    private vec2 dir
+    private real speed
+    protected lightning ltn
+    protected string hitFxPath = Abilities.farseerMissile
+
+    construct(vec2 p1, vec2 p2, vec2 direction, real speed, real lifetime)
+        dir = direction.norm()
+        this.p1 = p1
+        this.p2 = p2
+        ltn = addLightning(LIGHTNING_CHAIN_LIGHTNING_PRIMARY, false, p1, p2)
+        this.speed = speed
+        doPeriodicallyTimed(ANIMATION_PERIOD, lifetime) (CallbackCounted cb) ->
+            update(ANIMATION_PERIOD)
+            if cb.isLast()
+                destroy this
+
+    ondestroy
+        ltn.destr()            
+
+    protected function update(real delta)
+        let offset = dir * speed * delta
+        p1 += offset
+        p2 += offset
+        let ray = ray2d(p1, (p2 - p1).norm())
+        let dist = p1.distanceTo(p2)
+        var castResult = result2d(false, ZERO2, 0)
+        for seg in Segment
+            let segResult = ray.castToSegment(seg.getA().toVec2(), seg.getB().toVec2())
+            if segResult.intersects and segResult.distance <= dist
+                if not castResult.intersects
+                    castResult = segResult
+                else
+                    if segResult.distance < castResult.distance
+                        castResult = segResult
+        if castResult.intersects
+            ltn.move(false, p1, castResult.point)
+            flashEffect(hitFxPath, castResult.point)
+        else
+            ltn.move(false, p1, p2)
+        forUnitsInRange(p1 + (p2 - p1) * 0.5, dist, true) u ->
+            if u.isAlive()
+                let unitResult = ray.castToCircle(u.getPos(), u.getCollisionSize()).first
+                if castResult.intersects
+                    if unitResult.intersects and unitResult.distance <= castResult.distance
+                        u.kill()
+                        flashEffect(hitFxPath, u, "chest")
+                else
+                    if unitResult.intersects
+                        u.kill()
+                        flashEffect(hitFxPath, u, "chest")
+
+
+class RazorRed extends Razor
+    construct(vec2 p1, vec2 p2, vec2 direction, real speed, real lifetime)
+        super(p1, p2, direction, speed, lifetime)
+        ltn.destr()
+        ltn = addLightning(LIGHTNING_FINGER_OF_DEATH, false, p1, p2)
+        hitFxPath = Abilities.vengeanceMissile
+
+
+
+init
+    var choice = GetRandomInt(0, 1) == 1 ? 1 : -1
+    doPeriodically(GetRandomReal(3.5, 4.5)) cb ->
+        choice *= -1
+        let dir = START_POS.normalizedPointerTo(FINISH_POS)
+        switch choice
+            case 1
+                let p1 = START_POS + dir.rotate(angle(PI * 0.5)) * WIDTH * 0.5
+                let p2 = START_POS - dir.rotate(angle(PI * 0.5)) * WIDTH * 0.5
+                new Razor(p1, p2, dir, SPEED, START_POS.distanceTo(FINISH_POS) / SPEED)
+            case -1
+                let p1 = START_POS - dir.rotate(angle(PI * 0.5)) * WIDTH * 0.5
+                let p2 = START_POS + dir.rotate(angle(PI * 0.5)) * WIDTH * 0.5
+                new RazorRed(p1, p2, dir, SPEED, START_POS.distanceTo(FINISH_POS) / SPEED)

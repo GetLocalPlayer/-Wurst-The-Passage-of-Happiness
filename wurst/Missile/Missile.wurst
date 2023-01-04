@@ -1,0 +1,233 @@
+package Missile
+import NoWurst
+import LinkedListModule
+import Timer
+import public Effect
+import public Interpolation
+import public Vectors
+import Quaternion
+import Maths
+import Colors
+
+public class Missile
+    use LinkedListModule
+    protected unit owner
+    protected effect model
+    protected real scale = 1
+    protected real timeScale = 1
+    protected real distance
+    protected real speed
+    protected real remain
+    protected vec3 start
+    protected vec3 control
+    protected vec3 finish
+    protected vec3 pos
+    protected vec3 prevPos
+    protected quat orientation = IDENTITYQ
+    protected vec3 direction = vec3(1, 0, 0)
+    protected bool steering = false
+    protected bool paused = false
+    protected bool belowTerrain =  true
+    protected bool invalid = false
+    protected colorA colorRGBA = colorA(255, 255, 255, 255)
+    
+    private static let TIMER = CreateTimer()
+    private static let DELAY = 0.02
+    
+    /** Do not forget to use properly coords of the points which include terrain'sr Z or unit'sr Z */
+    construct(unit owner, string model, vec3 start, vec3 finish, real speed)
+        constructor(owner, model, start, finish, speed)
+    
+    /** Do not forget to use properly coords of the points which include terrain'sr and or unit'sr Z */
+    construct(unit owner, string model, vec3 start, vec3 finish, real trajectory, real speed)
+        constructor(owner, model, start, finish, speed)
+        control.z += 2 * start.distanceTo(finish) * trajectory - 0.5 * finish.z - 0.5 * start.z
+    
+    /** 'height' is height of the point through which the missile will pass in the mid of its path. */
+    construct(unit owner, string model, vec3 start, real height, vec3 finish, real speed)
+        constructor(owner, model, start, finish, speed)
+        control.z += 2 * height - 0.5 * finish.z - 0.5 * start.z
+
+    /** 'mid' is the point through which the missile will pass in the mid of its path. */
+    construct(unit owner, string model, vec3 start, vec3 mid, vec3 finish, real speed)
+        constructor(owner, model, start, finish, speed)
+        this.control = vec3(2. * mid.x - 0.5 * (finish.x + start.x),
+                        2. * mid.y - 0.5 * (finish.y + start.y),
+                        2. * mid.z - 0.5 * (finish.z + start.z))
+
+    /* To not repeat the same instructions form one constructor to another.
+    I'd feel like Wurst having constructor call-chain (like in Java or C#), but no :( */
+    protected function constructor(unit owner, string model, vec3 start, vec3 finish, real speed)
+        this.owner = owner
+        this.model = AddSpecialEffect(model, 0., 0.)
+        ..setPosition(start.x, start.y, start.z)
+        this.start = start
+        this.control = start.moveTowards(finish, start.distanceTo(finish)*0.5)
+        this.finish = finish
+        this.pos = start
+        this.prevPos = start
+        this.speed = speed
+        distance = start.distanceTo2d(finish)
+        orientation = vec3(0, 0, 1).toQuat(start.angleTo2d(finish))
+        direction = orientation.getX()
+        this.model.setOrientation(orientation)
+        remain = distance
+        if size == 1
+            TIMER.startPeriodic(DELAY, function updateAll)
+
+    ondestroy 
+        model.destr()
+        invalid = true
+
+    protected static function updateAll()
+        for missile in Missile
+            if not missile.isPaused()
+                missile.update(DELAY)
+        if Missile.size == 0
+            TIMER.pause()
+
+    protected function update(real delay)
+        if remain <= 0. or speed <= 0.
+            return
+        remain = remain > delay * speed ? remain-delay * speed : 0.
+        if remain > 0. and steering
+            updateSteering()
+        updatePosition()
+        if not invalid
+            actions(delay)
+        if remain <= 0. and not invalid
+            finalizer()
+
+    protected function updatePosition()
+        prevPos = pos
+        if remain > 0.
+            pos = start.bezier3(control, finish, 1. - remain / distance)
+        else
+            remain = 0.
+            pos = finish 
+        if belowTerrain
+            model.setPos(pos)
+        else
+            let terrainZ = pos.getTerrainZ()
+            if pos.z < terrainZ
+                /* Cannot use setZ directly. The native function doesn't
+                take into account previous changes. */
+                model.setPosition(pos.x, pos.y, terrainZ)
+            else
+                model.setPos(pos)
+
+    protected function updateSteering()
+        let newDirection = start.derivBezier3(control, finish, 1. - remain/distance).norm()
+        let axis = direction.cross(newDirection).norm()
+        let a = direction.dot(newDirection).acos().asAngleRadians()
+        if a.radians() > 0.005
+            if a.radians() > PI - 0.005
+                /* Dunno how to flip orientation better so
+                I just rotate it around Y-axis of the object's
+                orientation by 180 degrees. */
+                let y = orientation.getY()
+                orientation = y.toQuat(angle(PI)).cross(orientation)
+                direction = newDirection
+            else if axis.length().isBetween(0.995, 1.005)
+                let rot = axis.toQuat(a)
+                orientation = rot.cross(orientation)
+                direction = newDirection
+            model.setOrientation(orientation)
+    
+    protected function actions(real _delay)
+        skip
+
+    protected function finalizer()
+        destroy this
+    
+    function enableSteering()
+        steering = true
+        if (remain/distance).isBetween(0.995, 1.005)
+            /* A little trick to avoid wrong calculations at
+            the start point where we're getting a zero-vector.
+            Sets start orientation as well. */
+            let tmp = remain
+            remain -= speed * DELAY
+            updateSteering()
+            remain = tmp
+        else
+            updateSteering()
+
+    function disableSteering()
+        steering = false
+    
+    function getOwner() returns unit
+        return owner
+
+    function setOwner(unit newOwner)
+        owner = newOwner
+
+    function getOrientation() returns quat
+        return orientation 
+
+    function setOrientation(quat orientation)
+        this.orientation = orientation
+        model.setOrientation(orientation)
+
+    function getPos() returns vec3
+        return pos
+    
+    /** Does nothing if the missile in motion or unpaused. */
+    function setPos(vec3 pos) returns bool
+        if remain/distance < 0.005 or isPaused()
+            this.pos = pos
+            model.setPos(pos)
+            return true
+        return false
+
+    function getPrevPos() returns vec3
+        return prevPos
+    
+    function getSpeed() returns real
+        return speed
+
+    function setSpeed(real speed)
+        this.speed = speed
+
+    function getTimeScale() returns real
+        return timeScale
+
+    /** Affects the model, not movement. */
+    function setTimeScale(real timeScale)
+        this.timeScale = timeScale
+        model.setTimeScale(timeScale)
+    
+    function getScale() returns real
+        return scale
+
+    function setScale(real scale) 
+        this.scale = scale
+        model.setScale(scale)
+
+    /** Sets vertex color. */
+    function setColor(colorA colorRGBA)
+        model.setColor(colorRGBA)
+        this.colorRGBA = colorRGBA
+
+    function getColor() returns colorA
+        return colorRGBA
+
+    /** Sets player color. */
+    function setColorByPlayer(player p)
+        model.setColorByPlayer(p)
+    
+    function pause()
+        model.setTimeScale(0)
+        paused = true
+
+    function unpause()
+        model.setTimeScale(timeScale)
+        paused = false
+
+    function isPaused() returns bool
+        return paused
+
+    /** The missile's model can be below the terrain (not the same as the missile's position).
+    True by default. */
+    function belowTerrain(bool flag)
+        this.belowTerrain = flag

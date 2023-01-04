@@ -1,0 +1,62 @@
+package Segment
+import NoWurst
+import Lightning
+import MapBounds
+import Destructable
+import Unit
+import Effect
+import ClosureForGroups
+import Timer
+import LinkedListModule
+
+
+public class Segment
+    use LinkedListModule
+    private vec3 p1
+    private vec3 p2
+    private vec3 pos
+    private real width
+    private lightning light
+    private angle angularVelocity
+
+    private static let lightType = LIGHTNING_DRAIN
+    private static let touchEffect = "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdl"
+    private static let clock = CreateTimer()..startPeriodic(0.02, function updateAll)
+
+    construct(vec3 pos, real width, angle angularVelocity)
+        this.pos = pos
+        p1 = vec3(width/2, 0, 0)
+        p2 = vec3(-width/2, 0, 0)
+        this.width = width
+        light = addLightning(lightType, false, pos + p1, pos + p2)
+        this.angularVelocity = angularVelocity
+
+    private static function updateAll()
+        for s in Segment
+            s.update(clock.getElapsed())
+
+    private function update(real delay)
+        let a = angularVelocity * delay
+        p1 = p1.toVec2().rotate(a).toVec3()
+        p2 = p2.toVec2().rotate(a).toVec3()
+        light.move(false, pos + p1, pos + p2)
+        forUnitsInRange(pos.toVec2(), width, true) (unit u) ->
+            if u.isAlive() and u.getPos().distanceToSegmentSq((pos + p1).toVec2(), (pos + p2).toVec2()) <= u.getCollisionSize().squared()
+                flashEffect(touchEffect, u.getPos())
+                u.kill()
+            
+
+    function getA() returns vec3
+        return pos + p1
+    
+    function getB() returns vec3
+        return pos + p2
+
+
+init // Replace the barrels with segments
+    var angularVelocity = 45 .asAngleDegrees()
+    forDestructablesInRect(playableMapRect) d -> 
+        if d.getTypeId() == 'LTbr'
+            angularVelocity *= -1
+            new Segment(d.getPos().withTerrainZ(), 400, angularVelocity)
+            d.remove()

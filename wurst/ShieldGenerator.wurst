@@ -1,0 +1,171 @@
+package ShieldGenerator
+import LinkedListModule
+import Raycast
+import ClosureEvents
+import ClosureTimers
+
+
+import BuffObjEditing
+import ItemObjEditing
+import ChannelAbilityPreset
+
+
+constant ORIGIN_ITEM_ID = 'spsh'
+constant ITEM_ID = compiletime(ITEM_ID_GEN.next())
+constant ABIL_ID = compiletime(ABIL_ID_GEN.next())
+constant BUFF_ID = compiletime(BUFF_ID_GEN.next())
+
+constant FRONT_SHIELD_ID = compiletime(ABIL_ID_GEN.next())
+constant ABOVE_SHIELD_ID = compiletime(ABIL_ID_GEN.next())
+
+constant ABOVE_SHIELD_POINTS = [vec3(150, 150, 500), vec3(-150, -150, 500)]
+constant FRONT_SHIELD_POINTS = [vec3(250, 200, 0), vec3(250, -200, 250)]
+
+
+var counter = 0
+public Shield field = null
+
+tuple intersection(bool success, vec3 point)
+
+class Shield
+    use LinkedListModule
+    unit caster
+    vec3 p1
+    vec3 p2
+    vec3 p3
+    vec3 p4
+    lightning l1
+    lightning l2
+    lightning l3
+    lightning l4
+
+    construct(unit caster, vec3 p1, vec3 p2, vec3 p3, vec3 p4)
+        this.caster = caster
+        this.p1 = p1
+        this.p2 = p2
+        this.p3 = p3
+        this.p4 = p4
+        l1 = addLightning(LIGHTNING_DRAIN, false, p1, p2)
+        l2 = addLightning(LIGHTNING_DRAIN, false, p2, p3)
+        l3 = addLightning(LIGHTNING_DRAIN, false, p3, p4)
+        l4 = addLightning(LIGHTNING_DRAIN, false, p4, p1)
+
+    function intersects(vec3 a, vec3 b) returns intersection
+        let distance = a.distanceTo(b)
+        let ray = ray3d(a, a-b)
+        let cast1 = ray.castToTriangle(p1, p2, p3)
+        let cast2 = ray.castToTriangle(p3, p4, p1)
+        let cast = cast1.intersects ? cast1 : cast2
+        if cast.intersects and cast.distance <= distance
+            addEffect("Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdl", cast.point).destr()
+            let timed1 = addLightning(LIGHTNING_DRAIN, false, p1, cast.point)
+            let timed2 = addLightning(LIGHTNING_DRAIN, false, p2, cast.point)
+            let timed3 = addLightning(LIGHTNING_DRAIN, false, p3, cast.point)
+            let timed4 = addLightning(LIGHTNING_DRAIN, false, p4, cast.point)
+            var alpha = 255.
+            doPeriodically(ANIMATION_PERIOD) cb ->
+                alpha -= 255 * 0.02
+                if alpha > 0
+                    timed1.setColor(colorA(255, 255, 255, alpha.toInt()))
+                    timed2.setColor(colorA(255, 255, 255, alpha.toInt()))
+                    timed3.setColor(colorA(255, 255, 255, alpha.toInt()))
+                    timed4.setColor(colorA(255, 255, 255, alpha.toInt()))
+                else
+                    destroy cb
+                    timed1.destr()
+                    timed2.destr()
+                    timed3.destr()
+                    timed4.destr()
+            return intersection(true, cast.point)
+        return intersection(false, ZERO3)
+
+    ondestroy
+        l1.destr()
+        l2.destr()
+        l3.destr()
+        l4.destr()
+
+@compiletime function buildSHieldGenerator()
+    new ItemDefinition(ITEM_ID, ORIGIN_ITEM_ID)
+    ..setName("Shield Generator")
+    ..setDescription("Allows the caster to create a protective field that protects him from missilies.")
+    ..setTooltipExtended("Allows the caster to create a protective field that protects him from missilies.")
+    ..setAbilities(ABIL_ID.toRawCode())
+    ..setGoldCost(0)
+    new AbilityDefinitionAuraSlow(ABIL_ID)
+    ..setLevels(1)
+    ..setBuffs(1, BUFF_ID.toRawCode())
+    ..setTargetsAllowed(1, TargetsAllowed.self)
+    ..setMovementSpeedFactor(1, -0.5)
+    new BuffDefinition(BUFF_ID, 'BNss')
+    ..setName(1, "Shield Generator")
+    ..setTooltipNormal(1, "Shield Generator")
+    ..setTooltipNormalExtended(1, "It's too heavy!")
+        
+    new ChannelAbilityPreset(FRONT_SHIELD_ID, 1, true)
+    ..setIconNormal("ReplaceableTextures\\CommandButtons\\BTNHumanArmorUpThree.blp")
+    ..setTooltipNormal(1, " (|cffffcc00Q|r) |cffc3dbffCreates a protective field in frot of the caster.|r")
+    ..setTooltipNormalExtended(1, "")
+    ..setHotkeyNormal("Q")
+    ..setDisableOtherAbilities(1, false)
+    ..setArtDuration(1, 5)
+    ..setFollowThroughTime(1, 5)
+    ..setCooldown(1, 0)
+    ..setHeroAbility(false)
+    ..setItemAbility(false)
+    ..setButtonPositionNormalX(0)
+    ..setButtonPositionNormalY(2)
+    ..setTargetType(1, Targettype.NONE castTo int)
+    ..presetOption(Option.VISIBLE, true)
+        
+    new ChannelAbilityPreset(ABOVE_SHIELD_ID, 1, true)
+    ..setIconNormal("ReplaceableTextures\\CommandButtons\\BTNHumanArmorUpThree.blp")
+    ..setTooltipNormal(1, "(|cffffcc00W|r) |cffc3dbffCreates a protective field above the caster.|r")
+    ..setTooltipNormalExtended(1, "")
+    ..setHotkeyNormal("W")
+    ..setDisableOtherAbilities(1, false)
+    ..setArtDuration(1, 5)
+    ..setFollowThroughTime(1, 5)
+    ..setCooldown(1, 6)
+    ..setHeroAbility(false)
+    ..setItemAbility(false)
+    ..setButtonPositionNormalX(1)
+    ..setButtonPositionNormalY(2)
+    ..setTargetType(1, Targettype.NONE castTo int)
+    ..presetOption(Option.VISIBLE, true)
+
+
+init
+    createItem(ITEM_ID, gg_rct_ShieldGeneratorSpawn.getCenter())
+    EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM) () ->
+        EventData.getTriggerUnit().addAbility(ABOVE_SHIELD_ID)
+        EventData.getTriggerUnit().addAbility(FRONT_SHIELD_ID)
+
+    EventListener.add(EVENT_PLAYER_UNIT_DROP_ITEM) () ->
+        EventData.getTriggerUnit().removeAbility(ABOVE_SHIELD_ID)
+        EventData.getTriggerUnit().removeAbility(FRONT_SHIELD_ID)
+
+    
+    let eventCb = EventListener.onCast(FRONT_SHIELD_ID) caster ->
+        let id = EventData.getSpellAbilityId()
+        caster.disableAbility(id == FRONT_SHIELD_ID ? ABOVE_SHIELD_ID : id , true, false)
+        doAfter(caster.getAbilityCooldown(id, 1))->
+            caster.disableAbility(id == FRONT_SHIELD_ID ? ABOVE_SHIELD_ID : id, false, false)
+        let axis = vec3(0, 0, 1)
+        let angl = caster.getFacingAngle()
+        let pos = caster.getPos3Real()
+        let points = [ZERO3, ZERO3]
+        points[0] = id == FRONT_SHIELD_ID ? FRONT_SHIELD_POINTS[0] : ABOVE_SHIELD_POINTS[0]
+        points[1] = id == FRONT_SHIELD_ID ? FRONT_SHIELD_POINTS[1] : ABOVE_SHIELD_POINTS[1]
+        let p1 = vec3(points[0].x, points[0].y, points[0].z).rotate(axis, angl.radians()) + pos
+        let p2 = vec3(points[0].x, points[1].y, points[0].z).rotate(axis, angl.radians()) + pos
+        let p3 = vec3(points[1].x, points[1].y, points[1].z).rotate(axis, angl.radians()) + pos
+        let p4 = vec3(points[1].x, points[0].y, points[1].z).rotate(axis, angl.radians()) + pos
+        caster.setFacing(angl)
+        let shield = new Shield(caster, p1, p2, p3, p4)
+        EventListener.add(EVENT_PLAYER_UNIT_SPELL_ENDCAST) -> 
+            if EventData.getSpellAbilityId() == id and EventData.getTriggerUnit() == caster
+                destroy shield
+
+    EventListener.onCast(ABOVE_SHIELD_ID, eventCb)
+       

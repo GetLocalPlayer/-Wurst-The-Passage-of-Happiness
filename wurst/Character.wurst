@@ -1,0 +1,88 @@
+package Character
+import ClosureEvents
+import TimerUtils
+import ClosureTimers
+import ObjectIdGenerator
+import HeroPreset
+
+
+@compiletime function createCharacter() returns unit
+    let originId = 'Ofar'
+    let id = compiletime(HERO_ID_GEN.next())
+    if compiletime
+        new HeroPreset(id, originId, "Mad Poet")
+        ..buildHero()
+        ..setProperNames("Abdul Alhazred")
+        ..setProperNamesUsed(0)
+        ..setUnitSoundSet("Varimathras")
+        ..setMovementType(MovementType.Foot)
+        ..setAttacksEnabled(0)
+        ..setScalingValue(1.)
+        ..setModelFile("units\\creeps\\OrcWarlockRed\\OrcWarlockRed.mdl")
+        ..hideHeroDeathMsg(true)
+        ..hideHeroInterfaceIcon(true)
+        ..setHeroAbilities("")
+        ..setSelectionScale(1.)
+        ..setSpeedBase(250)
+        ..setManaMaximum(0)
+        ..setStartingStrength(0)
+        ..setStartingAgility(0)
+        ..setStartingIntelligence(0)
+        ..setCollisionSize(16)
+        return null
+    else
+        return createUnit(GetLocalPlayer(), id, gg_rct_Start.getCenter(), 135 .asAngleDegrees())
+
+
+constant REVIVE_TIME = 5.
+unit character
+var checkpoint = ZERO2
+var controlDirection = ZERO2
+var controlDirectionHasBeenUpdated = false
+
+
+init
+    FogEnableOff()
+    FogMaskEnableOff()
+    // Task
+    doAfter(0) ->
+        printTimed("|cFFFFCC00Reach the end of the road.|r", 10)
+    // Character
+    character = createCharacter()
+    character.getOwner()
+    ..select(character)
+    ..setCameraTargetControllerNoZ(character, ZERO2, false)
+    // Revive
+    EventListener.add(EVENT_PLAYER_UNIT_DEATH) ->
+        let dyingUnit = EventData.getDyingUnit()
+        flashEffect("Objects\\Spawnmodels\\Orc\\OrcSmallDeathExplode\\OrcSmallDeathExplode.mdl", dyingUnit.getPos())
+        let reviveTimer = getTimer()
+        let reviveTimerDialog = reviveTimer.createTimerDialog()
+        reviveTimerDialog.display(true)
+        // Camera
+        doPeriodicallyTimed(0.02, REVIVE_TIME) cb ->
+            panCameraToTimed(character.getPos(), 0)
+        reviveTimer.doAfter(REVIVE_TIME) () ->
+            dyingUnit.revive(checkpoint, true)
+            panCameraToTimed(checkpoint, 0)
+            reviveTimerDialog.destr()
+            dyingUnit.getOwner()..select(dyingUnit)
+            ..setCameraTargetControllerNoZ(dyingUnit, ZERO2, false)
+    // Victory
+    CreateTrigger()..registerRectEnterEventSource(gg_rct_Finish)
+    ..addAction() ->
+        CustomVictoryBJ(GetLocalPlayer(), true, false)
+ 
+    // Checkpoint
+    checkpoint = character.getPos()
+    CreateTrigger()..registerRectEnterEventSource(gg_rct_Checkpoint)
+    ..addAction() ->
+        checkpoint = gg_rct_Checkpoint.getCenter()
+        printTimed("|cFFC3DBFFYou've reached the checkpoint!|r", 5)
+        GetTriggeringTrigger().disable()
+
+    // Test
+    EventListener.add(EVENT_PLAYER_CHAT_FILTER) () ->
+        if EventData.getChatMessage() == "goToCheckpoint"
+            character.setPos(gg_rct_Checkpoint.getCenter())
+        
