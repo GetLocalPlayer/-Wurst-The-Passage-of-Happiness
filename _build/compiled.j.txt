@@ -120,7 +120,9 @@ rect gg_rct_Start=null
 rect gg_rct_RazorStart=null
 rect gg_rct_RazorFinish=null
 rect gg_rct_ShieldGeneratorSpawn=null
+rect gg_rct_RazorActivation=null
 string Abilities_farseerMissile=null
+string Abilities_greenDragonMissile=null
 string Abilities_vengeanceMissile=null
 integer AbilityIds_inventory=0
 real Angle_DEGTORAD=0.
@@ -233,15 +235,17 @@ real Razor_FINISH_POS_x=0.
 real Razor_FINISH_POS_y=0.
 real Razor_WIDTH=0.
 real Razor_SPEED=0.
+rect Razor_RAZOR_ACTIVATION_RECT=null
 integer Razor_LinkedListModule_first=0
 integer Razor_LinkedListModule_last=0
 integer Razor_LinkedListModule_size=0
 real Real_REAL_MAX=0.
 trigger array RegisterEvents_t
 integer RegisterEvents_onCastMap=0
-string Segment_lightType=null
-string Segment_touchEffect=null
-timer Segment_clock=null
+string Segment_LIGHTNING_TYPE=null
+string Segment_UNIT_HIT_FX=null
+real Segment_VELOCITY_radians=0.
+real Segment_WIDTH=0.
 integer Segment_LinkedListModule_first=0
 integer Segment_LinkedListModule_last=0
 integer Segment_LinkedListModule_size=0
@@ -278,9 +282,9 @@ real Vectors_ZERO3_y=0.
 real Vectors_ZERO3_z=0.
 location Vectors_tempLoc=null
 hashtable hashtable_compiletime=null
-hashtable hashtable_compiletime_478=null
-hashtable hashtable_compiletime_479=null
-hashtable hashtable_compiletime_480=null
+hashtable hashtable_compiletime_475=null
+hashtable hashtable_compiletime_476=null
+hashtable hashtable_compiletime_477=null
 integer array CallbackSingle_nextFree
 integer CallbackSingle_firstFree=0
 integer CallbackSingle_maxIndex=0
@@ -348,33 +352,33 @@ integer array Razor_nextFree
 integer Razor_firstFree=0
 integer Razor_maxIndex=0
 integer array Razor_typeId
-integer array BackIterator_nextFree_15
-integer BackIterator_firstFree_7=0
-integer BackIterator_maxIndex_11=0
-integer array Iterator_nextFree_168
-integer Iterator_firstFree_160=0
-integer Iterator_maxIndex_164=0
-integer array Segment_nextFree
-integer Segment_firstFree=0
-integer Segment_maxIndex=0
-integer array Segment_typeId
 integer array BackIterator_nextFree_16
 integer BackIterator_firstFree_8=0
 integer BackIterator_maxIndex_12=0
 integer array Iterator_nextFree_169
 integer Iterator_firstFree_161=0
 integer Iterator_maxIndex_165=0
-integer array Iterator_typeId
-integer array Shield_nextFree
-integer Shield_firstFree=0
-integer Shield_maxIndex=0
-integer array Shield_typeId
+integer array Segment_nextFree
+integer Segment_firstFree=0
+integer Segment_maxIndex=0
+integer array Segment_typeId
 integer array BackIterator_nextFree_17
 integer BackIterator_firstFree_9=0
 integer BackIterator_maxIndex_13=0
 integer array Iterator_nextFree_170
 integer Iterator_firstFree_162=0
 integer Iterator_maxIndex_166=0
+integer array Iterator_typeId
+integer array Shield_nextFree
+integer Shield_firstFree=0
+integer Shield_maxIndex=0
+integer array Shield_typeId
+integer array BackIterator_nextFree_18
+integer BackIterator_firstFree_10=0
+integer BackIterator_maxIndex_14=0
+integer array Iterator_nextFree_171
+integer Iterator_firstFree_163=0
+integer Iterator_maxIndex_167=0
 integer array UnitIndex_nextFree
 integer UnitIndex_firstFree=0
 integer UnitIndex_maxIndex=0
@@ -421,6 +425,7 @@ real array Razor_dir_y
 real array Razor_speed
 lightning array Razor_ltn
 string array Razor_hitFxPath
+integer array Razor_tim
 integer array Razor_LinkedListModule_prev
 integer array Razor_LinkedListModule_next
 real array ray_origin_x
@@ -429,29 +434,35 @@ real array ray_direction_x
 real array ray_direction_y
 boolean array castResult_intersects
 real array castResult_distance
-integer array this_592
+integer array this_598
 integer array this
-real array angularVelocity_radians
 real array Segment_p1_x
 real array Segment_p1_y
 real array Segment_p1_z
 real array Segment_p2_x
 real array Segment_p2_y
 real array Segment_p2_z
-real array Segment_pos_x
-real array Segment_pos_y
-real array Segment_pos_z
-real array Segment_width
-lightning array Segment_light
-real array Segment_angularVelocity_radians
+lightning array Segment_ltn
 integer array Segment_LinkedListModule_next
-integer array this_593
+real array rotation_radians
+real array angularVelocity_radians
+integer array this_599
+real array pos_x
+real array pos_y
+real array offset_x
+real array offset_y
+real array width
+real array ray_origin_x_501
+real array ray_origin_y_503
+real array ray_direction_x_497
+real array ray_direction_y_499
+real array width_650
 integer array Iterator_current
 boolean array Iterator_destroyOnClose
 unit array caster
 integer array id
-integer array id_482
-unit array caster_455
+integer array id_479
+unit array caster_453
 integer array shield
 lightning array Shield_l1
 lightning array Shield_l2
@@ -470,7 +481,11 @@ integer wurst_stack_depth=0
 string array wurst_stack
 real real_asAngleDegrees_return_radians=0.
 real real_fromDeg_return_radians=0.
+real angle_op_plus_return_radians=0.
 real angle_op_mult_return_radians=0.
+real vec2_withZ_return_x=0.
+real vec2_withZ_return_y=0.
+real vec2_withZ_return_z=0.
 real vec3_toVec2_return_x=0.
 real vec3_toVec2_return_y=0.
 real unit_getPos_return_x=0.
@@ -524,21 +539,23 @@ real vec2_withTerrainZ_return_y=0.
 real vec2_withTerrainZ_return_z=0.
 real vec2_normalizedPointerTo_return_x=0.
 real vec2_normalizedPointerTo_return_y=0.
+real vec3_op_plus_return_x_639=0.
+real vec3_op_plus_return_y_641=0.
+real vec3_op_plus_return_z_643=0.
+real vec3_op_minus_return_x=0.
+real vec3_op_minus_return_y=0.
+real vec3_op_minus_return_z=0.
 real vec3_rotate_return_x=0.
 real vec3_rotate_return_y=0.
 real vec3_rotate_return_z=0.
 real dispatch_Segment_Segment_Segment_getA_return_x=0.
 real dispatch_Segment_Segment_Segment_getA_return_y=0.
-real dispatch_Segment_Segment_Segment_getA_return_z=0.
 real dispatch_Segment_Segment_Segment_getB_return_x=0.
 real dispatch_Segment_Segment_Segment_getB_return_y=0.
-real dispatch_Segment_Segment_Segment_getB_return_z=0.
 real Segment_getA_return_x=0.
 real Segment_getA_return_y=0.
-real Segment_getA_return_z=0.
 real Segment_getB_return_x=0.
 real Segment_getB_return_y=0.
-real Segment_getB_return_z=0.
 code ref_function_init_Abilities=null
 code ref_function_init_AbilityIds=null
 code ref_function_init_Real=null
@@ -603,20 +620,20 @@ code ref_function_bridge_init_Segment=null
 code ref_function_bridge_init_Razor=null
 code ref_function_bridge_init_ShieldGenerator=null
 code ref_function_code__addAction_Character=null
-code ref_function_code__addAction_Character_538=null
+code ref_function_code__addAction_Character_543=null
 code ref_function_code__onUnitIndex_ClosureEvents=null
 code ref_function_bridge_code__onUnitDeindex_ClosureEvents=null
 code ref_function_bridge_EventListener_generalEventCallback=null
 code ref_function_bridge_code__Filter_ClosureForGroups=null
 code ref_function_bridge_code__EnumDestructablesInRect_ClosureForGroups=null
 code ref_function_code__startPeriodic_GameTimer=null
+code ref_function_bridge_code__addAction_Razor=null
 code ref_function_bridge_code__registerPlayerUnitEvent_RegisterEvents=null
-code ref_function_bridge_Segment_updateAll=null
 code ref_function_bridge_code__onEnter_UnitIndexer=null
 code ref_function_bridge_code__onLeave_UnitIndexer=null
 code ref_function_bridge_code__addAction_nullTimer_ClosureEvents=null
-code ref_function_bridge_code__addAction_nullTimer_ClosureEvents_510=null
-code ref_function_bridge_code__addAction_nullTimer_ClosureEvents_511=null
+code ref_function_bridge_code__addAction_nullTimer_ClosureEvents_515=null
+code ref_function_bridge_code__addAction_nullTimer_ClosureEvents_516=null
 code ref_function_bridge_code__registerPlayerUnitEvent_nullTimer_ClosureEvents=null
 code ref_function_bridge_CallbackCounted_staticCallback=null
 code ref_function_bridge_CallbackPeriodic_staticCallback=null
@@ -624,11 +641,11 @@ code ref_function_bridge_code__start_CallbackSingle_ClosureTimers=null
 code ref_function_code__Filter_registerEnterRegion_nullTimer_OnUnitEnterLeave=null
 code ref_function_code__registerPlayerUnitEvent_nullTimer_OnUnitEnterLeave=null
 code ref_function_code__ForGroup_nullTimer_OnUnitEnterLeave=null
-unit group_nexttempReturn=null
-timer getTimertempReturn=null
-trigger dispatch_Table_Table_Table_loadTriggertempReturn=null
-framehandle createFrametempReturn=null
 trigger triggerFromIndextempReturn=null
+unit group_nexttempReturn=null
+framehandle createFrametempReturn=null
+trigger dispatch_Table_Table_Table_loadTriggertempReturn=null
+timer getTimertempReturn=null
 endglobals
 native UnitAlive takes unit id_1 returns boolean
 function CreateNeutralPassiveBuildings takes nothing returns nothing
@@ -664,6 +681,7 @@ function CreateRegions takes nothing returns nothing
 	set gg_rct_RazorStart = Rect( - 2048.0,  - 2560.0,  - 1920.0,  - 2432.0)
 	set gg_rct_RazorFinish = Rect(1792.0,  - 6400.0, 1920.0,  - 6272.0)
 	set gg_rct_ShieldGeneratorSpawn = Rect( - 3392.0,  - 1376.0,  - 3264.0,  - 1248.0)
+	set gg_rct_RazorActivation = Rect( - 1024.0,  - 4544.0,  - 352.0,  - 3808.0)
 endfunction
 
 function InitGlobals takes nothing returns nothing
@@ -795,27 +813,27 @@ function error takes string msg, string w__wurst_stackPos returns nothing
 endfunction
 
 function initCompiletimeState_0 takes nothing returns nothing
-	set hashtable_compiletime_480 = InitHashtable()
-	set hashtable_compiletime_479 = InitHashtable()
-	set hashtable_compiletime_478 = InitHashtable()
+	set hashtable_compiletime_477 = InitHashtable()
+	set hashtable_compiletime_476 = InitHashtable()
+	set hashtable_compiletime_475 = InitHashtable()
 	set hashtable_compiletime = InitHashtable()
-	call SaveInteger(hashtable_compiletime_480, 1, -1663695754, 13)
-	call SaveInteger(hashtable_compiletime_480, 1, -854572045, 3)
-	call SaveInteger(hashtable_compiletime_480, 1, 349230650, 7)
-	call SaveInteger(hashtable_compiletime_480, 1, -1474492777, 9)
-	call SaveInteger(hashtable_compiletime_480, 1, 789744696, 15)
-	call SaveInteger(hashtable_compiletime_480, 1, -1559655710, 12)
-	call SaveInteger(hashtable_compiletime_480, 1, -943650483, 5)
-	call SaveInteger(hashtable_compiletime_480, 1, -1587459251, 10)
-	call SaveInteger(hashtable_compiletime_480, 1, -1894922563, 8)
-	call SaveInteger(hashtable_compiletime_480, 1, -1676716706, 11)
-	call SaveInteger(hashtable_compiletime_480, 1, 597637742, 14)
-	call SaveInteger(hashtable_compiletime_480, 1, -680649701, 4)
-	call SaveInteger(hashtable_compiletime_480, 1, -671760605, 6)
-	call SaveInteger(hashtable_compiletime_480, 1, -242600650, 0)
-	call SaveInteger(hashtable_compiletime_480, 1, -647782241, 2)
-	call SaveInteger(hashtable_compiletime_480, 1, 1132341824, 1)
-	call SaveStr(hashtable_compiletime_480, 2, 0, "")
+	call SaveInteger(hashtable_compiletime_477, 1, -1663695754, 13)
+	call SaveInteger(hashtable_compiletime_477, 1, -854572045, 3)
+	call SaveInteger(hashtable_compiletime_477, 1, 349230650, 7)
+	call SaveInteger(hashtable_compiletime_477, 1, -1474492777, 9)
+	call SaveInteger(hashtable_compiletime_477, 1, 789744696, 15)
+	call SaveInteger(hashtable_compiletime_477, 1, -1559655710, 12)
+	call SaveInteger(hashtable_compiletime_477, 1, -943650483, 5)
+	call SaveInteger(hashtable_compiletime_477, 1, -1587459251, 10)
+	call SaveInteger(hashtable_compiletime_477, 1, -1894922563, 8)
+	call SaveInteger(hashtable_compiletime_477, 1, -1676716706, 11)
+	call SaveInteger(hashtable_compiletime_477, 1, 597637742, 14)
+	call SaveInteger(hashtable_compiletime_477, 1, -680649701, 4)
+	call SaveInteger(hashtable_compiletime_477, 1, -671760605, 6)
+	call SaveInteger(hashtable_compiletime_477, 1, -242600650, 0)
+	call SaveInteger(hashtable_compiletime_477, 1, -647782241, 2)
+	call SaveInteger(hashtable_compiletime_477, 1, 1132341824, 1)
+	call SaveStr(hashtable_compiletime_477, 2, 0, "")
 endfunction
 
 function initCompiletimeState takes nothing returns nothing
@@ -938,8 +956,8 @@ function dealloc_Iterator takes integer obj, string w__wurst_stackPos returns no
 	if Iterator_typeId[obj] == 0 then
 		call error("Double free: object of type Iterator", "when calling error in LinkedListModule, line 71")
 	else
-		set Iterator_nextFree_169[Iterator_firstFree_161] = obj
-		set Iterator_firstFree_161 = Iterator_firstFree_161 + 1
+		set Iterator_nextFree_170[Iterator_firstFree_162] = obj
+		set Iterator_firstFree_162 = Iterator_firstFree_162 + 1
 		set Iterator_typeId[obj] = 0
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
@@ -986,23 +1004,23 @@ function Iterator_next takes integer this_1 returns integer
 	return res
 endfunction
 
-function alloc_Iterator_475 takes string w__wurst_stackPos returns integer
+function alloc_Iterator_472 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	if Iterator_firstFree_161 == 0 then
-		if Iterator_maxIndex_165 < 32768 then
-			set Iterator_maxIndex_165 = Iterator_maxIndex_165 + 1
-			set this_1 = Iterator_maxIndex_165
-			set Iterator_typeId[this_1] = 728
+	if Iterator_firstFree_162 == 0 then
+		if Iterator_maxIndex_166 < 32768 then
+			set Iterator_maxIndex_166 = Iterator_maxIndex_166 + 1
+			set this_1 = Iterator_maxIndex_166
+			set Iterator_typeId[this_1] = 729
 		else
 			call error("Out of memory: Could not create Iterator.", "when calling error in LinkedListModule, line 71")
 			set this_1 = 0
 		endif
 	else
-		set Iterator_firstFree_161 = Iterator_firstFree_161 - 1
-		set this_1 = Iterator_nextFree_169[Iterator_firstFree_161]
-		set Iterator_typeId[this_1] = 728
+		set Iterator_firstFree_162 = Iterator_firstFree_162 - 1
+		set this_1 = Iterator_nextFree_170[Iterator_firstFree_162]
+		set Iterator_typeId[this_1] = 729
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -1017,11 +1035,11 @@ function construct_Iterator_579 takes integer this_1, boolean destroyOnClose ret
 	set Iterator_destroyOnClose[this_1] = destroyOnClose
 endfunction
 
-function new_Iterator_851 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
+function new_Iterator_849 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_Iterator_475("when calling alloc_Iterator in LinkedListModule, line 75")
+	set this_1 = alloc_Iterator_472("when calling alloc_Iterator in LinkedListModule, line 75")
 	call construct_Iterator_579(this_1, destroyOnClose)
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -1031,7 +1049,7 @@ function Segment_LinkedListModule_iterator takes string w__wurst_stackPos return
 	local integer stackTrace_tempReturn
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set stackTrace_tempReturn = new_Iterator_851(true, "when calling new_Iterator in LinkedListModule, line 53")
+	set stackTrace_tempReturn = new_Iterator_849(true, "when calling new_Iterator in LinkedListModule, line 53")
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return stackTrace_tempReturn
 endfunction
@@ -1044,101 +1062,88 @@ function alloc_ForGroupCallback_forUnitsInRange_Razor_Razor takes string w__wurs
 		if ForGroupCallback_maxIndex < 32768 then
 			set ForGroupCallback_maxIndex = ForGroupCallback_maxIndex + 1
 			set this_1 = ForGroupCallback_maxIndex
-			set ForGroupCallback_typeId[this_1] = 674
+			set ForGroupCallback_typeId[this_1] = 675
 		else
-			call error("Out of memory: Could not create ForGroupCallback_forUnitsInRange_Razor_Razor.", "when calling error in Razor, line 59")
+			call error("Out of memory: Could not create ForGroupCallback_forUnitsInRange_Razor_Razor.", "when calling error in Razor, line 64")
 			set this_1 = 0
 		endif
 	else
 		set ForGroupCallback_firstFree = ForGroupCallback_firstFree - 1
 		set this_1 = ForGroupCallback_nextFree[ForGroupCallback_firstFree]
-		set ForGroupCallback_typeId[this_1] = 674
+		set ForGroupCallback_typeId[this_1] = 675
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
-function vec3_op_plus takes real this_x, real this_y, real this_z, real v_x, real v_y, real v_z returns real
-	set vec3_op_plus_return_x = this_x + v_x
-	set vec3_op_plus_return_y = this_y + v_y
-	set vec3_op_plus_return_z = this_z + v_z
-	return vec3_op_plus_return_x
+function vec3_toVec2 takes real this_x, real this_y, real this_z returns real
+	set vec3_toVec2_return_x = this_x
+	set vec3_toVec2_return_y = this_y
+	return vec3_toVec2_return_x
 endfunction
 
 function Segment_getA takes integer this_1 returns real
-	set Segment_getA_return_x = vec3_op_plus(Segment_pos_x[this_1], Segment_pos_y[this_1], Segment_pos_z[this_1], Segment_p1_x[this_1], Segment_p1_y[this_1], Segment_p1_z[this_1])
-	set Segment_getA_return_y = vec3_op_plus_return_y
-	set Segment_getA_return_z = vec3_op_plus_return_z
+	set Segment_getA_return_x = vec3_toVec2(Segment_p1_x[this_1], Segment_p1_y[this_1], Segment_p1_z[this_1])
+	set Segment_getA_return_y = vec3_toVec2_return_y
 	return Segment_getA_return_x
 endfunction
 
 function dispatch_Segment_Segment_Segment_getA takes integer this_1, string w__wurst_stackPos returns real
 	local real Segment_Segment_getA_result_x
 	local real Segment_Segment_getA_result_y
-	local real Segment_Segment_getA_result_z
 	local real tuple_temp
 	local real tuple_temp_1
-	local real tuple_temp_2
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	if Segment_typeId[this_1] == 0 then
 		if this_1 == 0 then
-			call error("Nullpointer exception when calling Segment.getA", "when calling error in Segment, line 49")
+			call error("Nullpointer exception when calling Segment.getA", "when calling error in Segment, line 46")
 		else
-			call error("Called Segment.getA on invalid object.", "when calling error in Segment, line 49")
+			call error("Called Segment.getA on invalid object.", "when calling error in Segment, line 46")
 		endif
 	endif
 	set tuple_temp = Segment_getA(this_1)
 	set tuple_temp_1 = Segment_getA_return_y
-	set tuple_temp_2 = Segment_getA_return_z
 	set Segment_Segment_getA_result_x = tuple_temp
 	set Segment_Segment_getA_result_y = tuple_temp_1
-	set Segment_Segment_getA_result_z = tuple_temp_2
 	set wurst_stack_depth = wurst_stack_depth - 1
 	set dispatch_Segment_Segment_Segment_getA_return_x = Segment_Segment_getA_result_x
 	set dispatch_Segment_Segment_Segment_getA_return_y = Segment_Segment_getA_result_y
-	set dispatch_Segment_Segment_Segment_getA_return_z = Segment_Segment_getA_result_z
 	return dispatch_Segment_Segment_Segment_getA_return_x
 endfunction
 
 function Segment_getB takes integer this_1 returns real
-	set Segment_getB_return_x = vec3_op_plus(Segment_pos_x[this_1], Segment_pos_y[this_1], Segment_pos_z[this_1], Segment_p2_x[this_1], Segment_p2_y[this_1], Segment_p2_z[this_1])
-	set Segment_getB_return_y = vec3_op_plus_return_y
-	set Segment_getB_return_z = vec3_op_plus_return_z
+	set Segment_getB_return_x = vec3_toVec2(Segment_p2_x[this_1], Segment_p2_y[this_1], Segment_p2_z[this_1])
+	set Segment_getB_return_y = vec3_toVec2_return_y
 	return Segment_getB_return_x
 endfunction
 
 function dispatch_Segment_Segment_Segment_getB takes integer this_1, string w__wurst_stackPos returns real
 	local real Segment_Segment_getB_result_x
 	local real Segment_Segment_getB_result_y
-	local real Segment_Segment_getB_result_z
 	local real tuple_temp
 	local real tuple_temp_1
-	local real tuple_temp_2
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	if Segment_typeId[this_1] == 0 then
 		if this_1 == 0 then
-			call error("Nullpointer exception when calling Segment.getB", "when calling error in Segment, line 52")
+			call error("Nullpointer exception when calling Segment.getB", "when calling error in Segment, line 49")
 		else
-			call error("Called Segment.getB on invalid object.", "when calling error in Segment, line 52")
+			call error("Called Segment.getB on invalid object.", "when calling error in Segment, line 49")
 		endif
 	endif
 	set tuple_temp = Segment_getB(this_1)
 	set tuple_temp_1 = Segment_getB_return_y
-	set tuple_temp_2 = Segment_getB_return_z
 	set Segment_Segment_getB_result_x = tuple_temp
 	set Segment_Segment_getB_result_y = tuple_temp_1
-	set Segment_Segment_getB_result_z = tuple_temp_2
 	set wurst_stack_depth = wurst_stack_depth - 1
 	set dispatch_Segment_Segment_Segment_getB_return_x = Segment_Segment_getB_result_x
 	set dispatch_Segment_Segment_Segment_getB_return_y = Segment_Segment_getB_result_y
-	set dispatch_Segment_Segment_Segment_getB_return_z = Segment_Segment_getB_result_z
 	return dispatch_Segment_Segment_Segment_getB_return_x
 endfunction
 
-function addEffect takes string path, real pos_x, real pos_y returns effect
-	return AddSpecialEffect(path, pos_x, pos_y)
+function addEffect takes string path, real pos_x_1, real pos_y_1 returns effect
+	return AddSpecialEffect(path, pos_x_1, pos_y_1)
 endfunction
 
 function effect_destr takes effect this_1 returns nothing
@@ -1157,8 +1162,8 @@ function effect_setYaw takes effect this_1, real yaw_radians returns nothing
 	call BlzSetSpecialEffectYaw(this_1, angle_radians(yaw_radians))
 endfunction
 
-function flashEffect_734 takes string path, real pos_x, real pos_y, real scale, real yaw_radians returns nothing
-	local effect receiver = addEffect(path, pos_x, pos_y)
+function flashEffect_733 takes string path, real pos_x_1, real pos_y_1, real scale, real yaw_radians returns nothing
+	local effect receiver = addEffect(path, pos_x_1, pos_y_1)
 	local effect receiver_1
 	local effect receiver_2
 	call effect_setScale(receiver, scale)
@@ -1176,8 +1181,8 @@ function real_fromDeg takes real this_1 returns real
 	return real_fromDeg_return_radians
 endfunction
 
-function flashEffect takes string path, real pos_x, real pos_y returns nothing
-	call flashEffect_734(path, pos_x, pos_y, 1.0, real_fromDeg(GetRandomReal(0., 359.)))
+function flashEffect takes string path, real pos_x_1, real pos_y_1 returns nothing
+	call flashEffect_733(path, pos_x_1, pos_y_1, 1.0, real_fromDeg(GetRandomReal(0., 359.)))
 endfunction
 
 function alloc_LLEntry takes string w__wurst_stackPos returns integer
@@ -1268,12 +1273,12 @@ function callback_forEachFrom_Preloader takes integer this_1, unit u returns not
 	call unit_remove(u)
 endfunction
 
-function addEffect_443 takes string path, widget target, string attachPointName returns effect
+function addEffect_439 takes string path, widget target, string attachPointName returns effect
 	return AddSpecialEffectTarget(path, target, attachPointName)
 endfunction
 
-function flashEffect_735 takes string path, widget target, string attachPointName returns nothing
-	call effect_destr(addEffect_443(path, target, attachPointName))
+function flashEffect_734 takes string path, widget target, string attachPointName returns nothing
+	call effect_destr(addEffect_439(path, target, attachPointName))
 endfunction
 
 function real_isBetween takes real this_1, real low, real high returns boolean
@@ -1476,41 +1481,45 @@ function callback_forUnitsInRange_Razor_Razor takes integer this_1, unit u retur
 		if castResult_intersects[this_1] then
 			if unitResult_intersects and unitResult_distance <= castResult_distance[this_1] then
 				call unit_kill(u)
-				call flashEffect_735(Razor_hitFxPath[this_592[this_1]], u, "chest")
+				call flashEffect_734(Razor_hitFxPath[this_598[this_1]], u, "chest")
 			endif
 		elseif unitResult_intersects then
 			call unit_kill(u)
-			call flashEffect_735(Razor_hitFxPath[this_592[this_1]], u, "chest")
+			call flashEffect_734(Razor_hitFxPath[this_598[this_1]], u, "chest")
 		endif
 	endif
 endfunction
 
-function vec2_distanceToSegmentSq takes real this_x, real this_y, real v1_x, real v1_y, real v2_x, real v2_y returns real
-	local real l2 = vec2_distanceToSq(v1_x, v1_y, v2_x, v2_y)
-	local real t
-	if l2 == 0. then
-		return vec2_distanceToSq(this_x, this_y, v1_x, v1_y)
-	endif
-	set t = ((this_x - v1_x) * (v2_x - v1_x) + (this_y - v1_y) * (v2_y - v1_y)) / l2
-	if t < 0. then
-		return vec2_distanceToSq(this_x, this_y, v1_x, v1_y)
-	endif
-	if t > 1. then
-		return vec2_distanceToSq(this_x, this_y, v2_x, v2_y)
-	endif
-	return vec2_distanceToSq(this_x, this_y, v1_x + t * (v2_x - v1_x), v1_y + t * (v2_y - v1_y))
-endfunction
-
-function vec3_toVec2 takes real this_x, real this_y, real this_z returns real
-	set vec3_toVec2_return_x = this_x
-	set vec3_toVec2_return_y = this_y
-	return vec3_toVec2_return_x
-endfunction
-
-function callback_forUnitsInRange_Segment_Segment takes integer this_1, unit u returns nothing
-	if unit_isAlive(u) and vec2_distanceToSegmentSq(unit_getPos(u), unit_getPos_return_y, vec3_toVec2(vec3_op_plus(Segment_pos_x[this_593[this_1]], Segment_pos_y[this_593[this_1]], Segment_pos_z[this_593[this_1]], Segment_p1_x[this_593[this_1]], Segment_p1_y[this_593[this_1]], Segment_p1_z[this_593[this_1]]), vec3_op_plus_return_y, vec3_op_plus_return_z), vec3_toVec2_return_y, vec3_toVec2(vec3_op_plus(Segment_pos_x[this_593[this_1]], Segment_pos_y[this_593[this_1]], Segment_pos_z[this_593[this_1]], Segment_p2_x[this_593[this_1]], Segment_p2_y[this_593[this_1]], Segment_p2_z[this_593[this_1]]), vec3_op_plus_return_y, vec3_op_plus_return_z), vec3_toVec2_return_y) <= real_squared(unit_getCollisionSize(u)) then
-		call flashEffect(Segment_touchEffect, unit_getPos(u), unit_getPos_return_y)
-		call unit_kill(u)
+function callback_forUnitsInRange_doPeriodically_Segment_Segment takes integer this_1, unit u returns nothing
+	local boolean castResult_intersects_1
+	local real castResult_distance_1
+	local boolean temp_tuple_first_intersects
+	local real temp_tuple_first_point_x
+	local real temp_tuple_first_point_y
+	local real temp_tuple_first_distance
+	local boolean tuple_temp
+	local real tuple_temp_1
+	local real tuple_temp_2
+	local real tuple_temp_3
+	local boolean tuple_temp_4
+	local real tuple_temp_5
+	if unit_isAlive(u) then
+		set tuple_temp = ray2d_castToCircle(ray_origin_x_501[this_1], ray_origin_y_503[this_1], ray_direction_x_497[this_1], ray_direction_y_499[this_1], unit_getPos(u), unit_getPos_return_y, unit_getCollisionSize(u))
+		set tuple_temp_1 = ray2d_castToCircle_return_first_point_x
+		set tuple_temp_2 = ray2d_castToCircle_return_first_point_y
+		set tuple_temp_3 = ray2d_castToCircle_return_first_distance
+		set temp_tuple_first_intersects = tuple_temp
+		set temp_tuple_first_point_x = tuple_temp_1
+		set temp_tuple_first_point_y = tuple_temp_2
+		set temp_tuple_first_distance = tuple_temp_3
+		set tuple_temp_4 = temp_tuple_first_intersects
+		set tuple_temp_5 = temp_tuple_first_distance
+		set castResult_intersects_1 = tuple_temp_4
+		set castResult_distance_1 = tuple_temp_5
+		if castResult_intersects_1 and castResult_distance_1 <= width_650[this_1] then
+			call flashEffect_734(Segment_UNIT_HIT_FX, u, "origin")
+			call unit_kill(u)
+		endif
 	endif
 endfunction
 
@@ -1524,16 +1533,16 @@ function dispatch_ForGroupCallback_ClosureForGroups_ForGroupCallback_callback ta
 			call error("Called ForGroupCallback.callback on invalid object.", "when calling error in ClosureForGroups, line 4")
 		endif
 	endif
-	if ForGroupCallback_typeId[this_1] <= 673 then
-		if ForGroupCallback_typeId[this_1] <= 672 then
+	if ForGroupCallback_typeId[this_1] <= 674 then
+		if ForGroupCallback_typeId[this_1] <= 673 then
 			call callback_forEachFrom_LinkedList(this_1, u, "when calling callback_forEachFrom_LinkedList in ClosureForGroups, line 4")
 		else
 			call callback_forEachFrom_Preloader(this_1, u)
 		endif
-	elseif ForGroupCallback_typeId[this_1] <= 674 then
+	elseif ForGroupCallback_typeId[this_1] <= 675 then
 		call callback_forUnitsInRange_Razor_Razor(this_1, u)
 	else
-		call callback_forUnitsInRange_Segment_Segment(this_1, u)
+		call callback_forUnitsInRange_doPeriodically_Segment_Segment(this_1, u)
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
@@ -1604,26 +1613,26 @@ function pushCallback takes integer c returns nothing
 	set ClosureForGroups_maxCount = Integer_INT_MAX
 endfunction
 
-function forUnitsInRange takes real pos_x, real pos_y, real radius, boolean collisionSizeFiltering, integer c, string w__wurst_stackPos returns nothing
+function forUnitsInRange takes real pos_x_1, real pos_y_1, real radius, boolean collisionSizeFiltering, integer c, string w__wurst_stackPos returns nothing
 	local unit u
 	local group from
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	if collisionSizeFiltering then
 		call pushCallback(c)
-		call GroupEnumUnitsInRange(Group_ENUM_GROUP, pos_x, pos_y, radius + Basics_MAX_COLLISION_SIZE, null)
+		call GroupEnumUnitsInRange(Group_ENUM_GROUP, pos_x_1, pos_y_1, radius + Basics_MAX_COLLISION_SIZE, null)
 		set from = Group_ENUM_GROUP
 		loop
 			exitwhen  not group_hasNext(from)
 			set u = group_next(from)
-			if IsUnitInRangeXY(u, pos_x, pos_y, radius) then
+			if IsUnitInRangeXY(u, pos_x_1, pos_y_1, radius) then
 				call dispatch_ForGroupCallback_ClosureForGroups_ForGroupCallback_callback(c, u, "when calling callback in ClosureForGroups, line 110")
 			endif
 		endloop
 		call popCallback("when calling popCallback in ClosureForGroups, line 111")
 	else
 		call pushCallback(c)
-		call GroupEnumUnitsInRange(ClosureForGroups_DUMMY_GROUP, pos_x, pos_y, radius, ClosureForGroups_filter)
+		call GroupEnumUnitsInRange(ClosureForGroups_DUMMY_GROUP, pos_x_1, pos_y_1, radius, ClosureForGroups_filter)
 		call popCallback("when calling popCallback in ClosureForGroups, line 115")
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
@@ -1631,8 +1640,8 @@ function forUnitsInRange takes real pos_x, real pos_y, real radius, boolean coll
 	set from = null
 endfunction
 
-function lightning_move takes lightning this_1, boolean checkVisibility, real start_x, real start_y, real w_end_x, real w_end_y returns boolean
-	return MoveLightning(this_1, checkVisibility, start_x, start_y, w_end_x, w_end_y)
+function lightning_move takes lightning this_1, boolean checkVisibility, real start_x, real start_y, real start_z, real w_end_x, real w_end_y, real w_end_z returns boolean
+	return MoveLightningEx(this_1, checkVisibility, start_x, start_y, start_z, w_end_x, w_end_y, w_end_z)
 endfunction
 
 function real_abs takes real this_1 returns real
@@ -1727,9 +1736,28 @@ function vec2_norm takes real this_x, real this_y returns real
 	return vec2_norm_return_x
 endfunction
 
+function vec2_getTerrainZ takes real this_x, real this_y returns real
+	call MoveLocation(Vectors_tempLoc, this_x, this_y)
+	return GetLocationZ(Vectors_tempLoc)
+endfunction
+
+function vec2_withTerrainZ takes real this_x, real this_y returns real
+	set vec2_withTerrainZ_return_x = this_x
+	set vec2_withTerrainZ_return_y = this_y
+	set vec2_withTerrainZ_return_z = vec2_getTerrainZ(this_x, this_y)
+	return vec2_withTerrainZ_return_x
+endfunction
+
+function vec2_withZ takes real this_x, real this_y, real z returns real
+	set vec2_withZ_return_x = this_x
+	set vec2_withZ_return_y = this_y
+	set vec2_withZ_return_z = z
+	return vec2_withZ_return_x
+endfunction
+
 function Razor_update takes integer this_1, real delta, string w__wurst_stackPos returns nothing
-	local real offset_x
-	local real offset_y
+	local real offset_x_1
+	local real offset_y_1
 	local real ray_origin_x_1
 	local real ray_origin_y_1
 	local real ray_direction_x_1
@@ -1745,6 +1773,9 @@ function Razor_update takes integer this_1, real delta, string w__wurst_stackPos
 	local real segResult_point_x
 	local real segResult_point_y
 	local real segResult_distance
+	local real posBetween_x
+	local real posBetween_y
+	local real posBetween_z
 	local integer clVar
 	local real temp_x
 	local real temp_y
@@ -1781,19 +1812,22 @@ function Razor_update takes integer this_1, real delta, string w__wurst_stackPos
 	local real tuple_temp_29
 	local real tuple_temp_30
 	local real tuple_temp_31
-	local boolean tuple_temp_32
+	local real tuple_temp_32
 	local real tuple_temp_33
+	local real tuple_temp_34
+	local boolean tuple_temp_35
+	local real tuple_temp_36
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	set tuple_temp = vec2_op_mult(vec2_op_mult(Razor_dir_x[this_1], Razor_dir_y[this_1], Razor_speed[this_1]), vec2_op_mult_return_y, delta)
 	set tuple_temp_1 = vec2_op_mult_return_y
-	set offset_x = tuple_temp
-	set offset_y = tuple_temp_1
-	set tuple_temp_2 = vec2_op_plus(Razor_p1_x[this_1], Razor_p1_y[this_1], offset_x, offset_y)
+	set offset_x_1 = tuple_temp
+	set offset_y_1 = tuple_temp_1
+	set tuple_temp_2 = vec2_op_plus(Razor_p1_x[this_1], Razor_p1_y[this_1], offset_x_1, offset_y_1)
 	set tuple_temp_3 = vec2_op_plus_return_y
 	set Razor_p1_x[this_1] = tuple_temp_2
 	set Razor_p1_y[this_1] = tuple_temp_3
-	set tuple_temp_4 = vec2_op_plus(Razor_p2_x[this_1], Razor_p2_y[this_1], offset_x, offset_y)
+	set tuple_temp_4 = vec2_op_plus(Razor_p2_x[this_1], Razor_p2_y[this_1], offset_x_1, offset_y_1)
 	set tuple_temp_5 = vec2_op_plus_return_y
 	set Razor_p2_x[this_1] = tuple_temp_4
 	set Razor_p2_y[this_1] = tuple_temp_5
@@ -1814,11 +1848,11 @@ function Razor_update takes integer this_1, real delta, string w__wurst_stackPos
 	set castResult_point_x = tuple_temp_11
 	set castResult_point_y = tuple_temp_12
 	set castResult_distance_1 = tuple_temp_13
-	set iterator = Segment_LinkedListModule_iterator("when calling iterator in Razor, line 46")
+	set iterator = Segment_LinkedListModule_iterator("when calling iterator in Razor, line 50")
 	loop
 		exitwhen  not Iterator_hasNext(iterator)
 		set seg = Iterator_next(iterator)
-		set tuple_temp_14 = ray2d_castToSegment(ray_origin_x_1, ray_origin_y_1, ray_direction_x_1, ray_direction_y_1, vec3_toVec2(dispatch_Segment_Segment_Segment_getA(seg, "when calling getA in Razor, line 47"), dispatch_Segment_Segment_Segment_getA_return_y, dispatch_Segment_Segment_Segment_getA_return_z), vec3_toVec2_return_y, vec3_toVec2(dispatch_Segment_Segment_Segment_getB(seg, "when calling getB in Razor, line 47"), dispatch_Segment_Segment_Segment_getB_return_y, dispatch_Segment_Segment_Segment_getB_return_z), vec3_toVec2_return_y)
+		set tuple_temp_14 = ray2d_castToSegment(ray_origin_x_1, ray_origin_y_1, ray_direction_x_1, ray_direction_y_1, dispatch_Segment_Segment_Segment_getA(seg, "when calling getA in Razor, line 51"), dispatch_Segment_Segment_Segment_getA_return_y, dispatch_Segment_Segment_Segment_getB(seg, "when calling getB in Razor, line 51"), dispatch_Segment_Segment_Segment_getB_return_y)
 		set tuple_temp_15 = ray2d_castToSegment_return_point_x
 		set tuple_temp_16 = ray2d_castToSegment_return_point_y
 		set tuple_temp_17 = ray2d_castToSegment_return_distance
@@ -1848,33 +1882,39 @@ function Razor_update takes integer this_1, real delta, string w__wurst_stackPos
 			endif
 		endif
 	endloop
-	call Iterator_close(iterator, "when calling close in Razor, line 46")
+	call Iterator_close(iterator, "when calling close in Razor, line 50")
+	set tuple_temp_26 = vec2_withTerrainZ(vec2_op_plus(Razor_p1_x[this_1], Razor_p1_y[this_1], vec2_op_mult(vec2_op_minus(Razor_p2_x[this_1], Razor_p2_y[this_1], Razor_p1_x[this_1], Razor_p1_y[this_1]), vec2_op_minus_return_y, 0.5), vec2_op_mult_return_y), vec2_op_plus_return_y)
+	set tuple_temp_27 = vec2_withTerrainZ_return_y
+	set tuple_temp_28 = vec2_withTerrainZ_return_z
+	set posBetween_x = tuple_temp_26
+	set posBetween_y = tuple_temp_27
+	set posBetween_z = tuple_temp_28
 	if castResult_intersects_1 then
-		call lightning_move(Razor_ltn[this_1], false, Razor_p1_x[this_1], Razor_p1_y[this_1], castResult_point_x, castResult_point_y)
+		call lightning_move(Razor_ltn[this_1], false, vec2_withZ(Razor_p1_x[this_1], Razor_p1_y[this_1], posBetween_z), vec2_withZ_return_y, vec2_withZ_return_z, vec2_withZ(castResult_point_x, castResult_point_y, posBetween_z), vec2_withZ_return_y, vec2_withZ_return_z)
 		call flashEffect(Razor_hitFxPath[this_1], castResult_point_x, castResult_point_y)
 	else
-		call lightning_move(Razor_ltn[this_1], false, Razor_p1_x[this_1], Razor_p1_y[this_1], Razor_p2_x[this_1], Razor_p2_y[this_1])
+		call lightning_move(Razor_ltn[this_1], false, vec2_withZ(Razor_p1_x[this_1], Razor_p1_y[this_1], posBetween_z), vec2_withZ_return_y, vec2_withZ_return_z, vec2_withZ(Razor_p2_x[this_1], Razor_p2_y[this_1], posBetween_z), vec2_withZ_return_y, vec2_withZ_return_z)
 	endif
-	set tuple_temp_26 = vec2_op_plus(Razor_p1_x[this_1], Razor_p1_y[this_1], vec2_op_mult(vec2_op_minus(Razor_p2_x[this_1], Razor_p2_y[this_1], Razor_p1_x[this_1], Razor_p1_y[this_1]), vec2_op_minus_return_y, 0.5), vec2_op_mult_return_y)
-	set tuple_temp_27 = vec2_op_plus_return_y
-	set temp_x = tuple_temp_26
-	set temp_y = tuple_temp_27
+	set tuple_temp_29 = vec3_toVec2(posBetween_x, posBetween_y, posBetween_z)
+	set tuple_temp_30 = vec3_toVec2_return_y
+	set temp_x = tuple_temp_29
+	set temp_y = tuple_temp_30
 	set temp = dist
-	set clVar = alloc_ForGroupCallback_forUnitsInRange_Razor_Razor("when calling alloc_ForGroupCallback_forUnitsInRange_Razor_Razor in Razor, line 59")
-	set tuple_temp_28 = ray_origin_x_1
-	set tuple_temp_29 = ray_origin_y_1
-	set tuple_temp_30 = ray_direction_x_1
-	set tuple_temp_31 = ray_direction_y_1
-	set ray_origin_x[clVar] = tuple_temp_28
-	set ray_origin_y[clVar] = tuple_temp_29
-	set ray_direction_x[clVar] = tuple_temp_30
-	set ray_direction_y[clVar] = tuple_temp_31
-	set tuple_temp_32 = castResult_intersects_1
-	set tuple_temp_33 = castResult_distance_1
-	set castResult_intersects[clVar] = tuple_temp_32
-	set castResult_distance[clVar] = tuple_temp_33
-	set this_592[clVar] = this_1
-	call forUnitsInRange(temp_x, temp_y, temp, true, clVar, "when calling forUnitsInRange in Razor, line 59")
+	set clVar = alloc_ForGroupCallback_forUnitsInRange_Razor_Razor("when calling alloc_ForGroupCallback_forUnitsInRange_Razor_Razor in Razor, line 64")
+	set tuple_temp_31 = ray_origin_x_1
+	set tuple_temp_32 = ray_origin_y_1
+	set tuple_temp_33 = ray_direction_x_1
+	set tuple_temp_34 = ray_direction_y_1
+	set ray_origin_x[clVar] = tuple_temp_31
+	set ray_origin_y[clVar] = tuple_temp_32
+	set ray_direction_x[clVar] = tuple_temp_33
+	set ray_direction_y[clVar] = tuple_temp_34
+	set tuple_temp_35 = castResult_intersects_1
+	set tuple_temp_36 = castResult_distance_1
+	set castResult_intersects[clVar] = tuple_temp_35
+	set castResult_distance[clVar] = tuple_temp_36
+	set this_598[clVar] = this_1
+	call forUnitsInRange(temp_x, temp_y, temp, true, clVar, "when calling forUnitsInRange in Razor, line 64")
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
@@ -1883,127 +1923,12 @@ function dispatch_Razor_Razor_Razor_update takes integer this_1, real delta, str
 	set wurst_stack_depth = wurst_stack_depth + 1
 	if Razor_typeId[this_1] == 0 then
 		if this_1 == 0 then
-			call error("Nullpointer exception when calling Razor.update", "when calling error in Razor, line 39")
+			call error("Nullpointer exception when calling Razor.update", "when calling error in Razor, line 43")
 		else
-			call error("Called Razor.update on invalid object.", "when calling error in Razor, line 39")
+			call error("Called Razor.update on invalid object.", "when calling error in Razor, line 43")
 		endif
 	endif
-	call Razor_update(this_1, delta, "when calling update in Razor, line 39")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function Razor_LinkedListModule_remove takes integer this_1 returns nothing
-	set Razor_LinkedListModule_size = Razor_LinkedListModule_size - 1
-	if this_1 != Razor_LinkedListModule_first then
-		set Razor_LinkedListModule_next[Razor_LinkedListModule_prev[this_1]] = Razor_LinkedListModule_next[this_1]
-	else
-		set Razor_LinkedListModule_first = Razor_LinkedListModule_next[this_1]
-	endif
-	if this_1 != Razor_LinkedListModule_last then
-		set Razor_LinkedListModule_prev[Razor_LinkedListModule_next[this_1]] = Razor_LinkedListModule_prev[this_1]
-	else
-		set Razor_LinkedListModule_last = Razor_LinkedListModule_prev[this_1]
-	endif
-endfunction
-
-function dispatch_Razor_Razor_Razor_LinkedListModule_remove takes integer this_1, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if Razor_typeId[this_1] == 0 then
-		if this_1 == 0 then
-			call error("Nullpointer exception when calling Razor.remove", "when calling error in LinkedListModule, line 37")
-		else
-			call error("Called Razor.remove on invalid object.", "when calling error in LinkedListModule, line 37")
-		endif
-	endif
-	call Razor_LinkedListModule_remove(this_1)
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function lightning_destr takes lightning this_1 returns boolean
-	return DestroyLightning(this_1)
-endfunction
-
-function Razor_onDestroy takes integer this_1, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	call lightning_destr(Razor_ltn[this_1])
-	call dispatch_Razor_Razor_Razor_LinkedListModule_remove(this_1, "when calling remove in LinkedListModule, line 49")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function dealloc_Razor takes integer obj, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if Razor_typeId[obj] == 0 then
-		call error("Double free: object of type Razor", "when calling error in Razor, line 16")
-	else
-		set Razor_nextFree[Razor_firstFree] = obj
-		set Razor_firstFree = Razor_firstFree + 1
-		set Razor_typeId[obj] = 0
-	endif
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function destroyRazor takes integer this_1, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	call Razor_onDestroy(this_1, "when calling Razor_onDestroy in Razor, line 36")
-	call dealloc_Razor(this_1, "when calling dealloc_Razor in Razor, line 36")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function dispatch_Razor_destroyRazor takes integer this_1, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if Razor_typeId[this_1] == 0 then
-		if this_1 == 0 then
-			call error("Nullpointer exception when calling Razor.Razor", "when calling error in Razor, line 16")
-		else
-			call error("Called Razor.Razor on invalid object.", "when calling error in Razor, line 16")
-		endif
-	endif
-	call destroyRazor(this_1, "when calling destroyRazor in Razor, line 16")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function call_doPeriodicallyTimed_Razor_Razor takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	call dispatch_Razor_Razor_Razor_update(this[this_1], Basics_ANIMATION_PERIOD, "when calling update in Razor, line 32")
-	if dispatch_CallbackCounted_ClosureTimers_CallbackCounted_isLast(cb, "when calling isLast in Razor, line 33") then
-		call dispatch_Razor_destroyRazor(this[this_1], "when calling dispatch_Razor_destroyRazor in Razor, line 34")
-	endif
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function panCameraToTimed takes real pos_x, real pos_y, real duration returns nothing
-	call PanCameraToTimed(pos_x, pos_y, duration)
-endfunction
-
-function call_doPeriodicallyTimed_add_Character takes integer this_1, integer cb returns nothing
-	call panCameraToTimed(unit_getPos(Character_character), unit_getPos_return_y, 0.)
-endfunction
-
-function dispatch_CallbackCounted_ClosureTimers_CallbackCounted_call takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if CallbackCounted_typeId[this_1] == 0 then
-		if this_1 == 0 then
-			call error("Nullpointer exception when calling CallbackCounted.call", "when calling error in ClosureTimers, line 149")
-		else
-			call error("Called CallbackCounted.call on invalid object.", "when calling error in ClosureTimers, line 149")
-		endif
-	endif
-	if CallbackCounted_typeId[this_1] <= 643 then
-		if CallbackCounted_typeId[this_1] <= 642 then
-			call call_doPeriodicallyCounted_ClosureTimers(this_1, cb, "when calling call_doPeriodicallyCounted_ClosureTimers in ClosureTimers, line 149")
-		else
-			call call_doPeriodicallyTimed_Razor_Razor(this_1, cb, "when calling call_doPeriodicallyTimed_Razor_Razor in ClosureTimers, line 149")
-		endif
-	else
-		call call_doPeriodicallyTimed_add_Character(this_1, cb)
-	endif
+	call Razor_update(this_1, delta, "when calling update in Razor, line 43")
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
@@ -2131,6 +2056,122 @@ function dispatch_CallbackCounted_destroyCallbackCounted takes integer this_1, s
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
+function Razor_LinkedListModule_remove takes integer this_1 returns nothing
+	set Razor_LinkedListModule_size = Razor_LinkedListModule_size - 1
+	if this_1 != Razor_LinkedListModule_first then
+		set Razor_LinkedListModule_next[Razor_LinkedListModule_prev[this_1]] = Razor_LinkedListModule_next[this_1]
+	else
+		set Razor_LinkedListModule_first = Razor_LinkedListModule_next[this_1]
+	endif
+	if this_1 != Razor_LinkedListModule_last then
+		set Razor_LinkedListModule_prev[Razor_LinkedListModule_next[this_1]] = Razor_LinkedListModule_prev[this_1]
+	else
+		set Razor_LinkedListModule_last = Razor_LinkedListModule_prev[this_1]
+	endif
+endfunction
+
+function dispatch_Razor_Razor_Razor_LinkedListModule_remove takes integer this_1, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if Razor_typeId[this_1] == 0 then
+		if this_1 == 0 then
+			call error("Nullpointer exception when calling Razor.remove", "when calling error in LinkedListModule, line 37")
+		else
+			call error("Called Razor.remove on invalid object.", "when calling error in LinkedListModule, line 37")
+		endif
+	endif
+	call Razor_LinkedListModule_remove(this_1)
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function lightning_destr takes lightning this_1 returns boolean
+	return DestroyLightning(this_1)
+endfunction
+
+function Razor_onDestroy takes integer this_1, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	call lightning_destr(Razor_ltn[this_1])
+	call dispatch_CallbackCounted_destroyCallbackCounted(Razor_tim[this_1], "when calling dispatch_CallbackCounted_destroyCallbackCounted in Razor, line 41")
+	call dispatch_Razor_Razor_Razor_LinkedListModule_remove(this_1, "when calling remove in LinkedListModule, line 49")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function dealloc_Razor takes integer obj, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if Razor_typeId[obj] == 0 then
+		call error("Double free: object of type Razor", "when calling error in Razor, line 17")
+	else
+		set Razor_nextFree[Razor_firstFree] = obj
+		set Razor_firstFree = Razor_firstFree + 1
+		set Razor_typeId[obj] = 0
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function destroyRazor takes integer this_1, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	call Razor_onDestroy(this_1, "when calling Razor_onDestroy in Razor, line 39")
+	call dealloc_Razor(this_1, "when calling dealloc_Razor in Razor, line 39")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function dispatch_Razor_destroyRazor takes integer this_1, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if Razor_typeId[this_1] == 0 then
+		if this_1 == 0 then
+			call error("Nullpointer exception when calling Razor.Razor", "when calling error in Razor, line 17")
+		else
+			call error("Called Razor.Razor on invalid object.", "when calling error in Razor, line 17")
+		endif
+	endif
+	call destroyRazor(this_1, "when calling destroyRazor in Razor, line 17")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function call_doPeriodicallyTimed_Razor_Razor takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	call dispatch_Razor_Razor_Razor_update(this[this_1], Basics_ANIMATION_PERIOD, "when calling update in Razor, line 35")
+	if dispatch_CallbackCounted_ClosureTimers_CallbackCounted_isLast(cb, "when calling isLast in Razor, line 36") then
+		call dispatch_Razor_destroyRazor(this[this_1], "when calling dispatch_Razor_destroyRazor in Razor, line 37")
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function panCameraToTimed takes real pos_x_1, real pos_y_1, real duration returns nothing
+	call PanCameraToTimed(pos_x_1, pos_y_1, duration)
+endfunction
+
+function call_doPeriodicallyTimed_add_Character takes integer this_1, integer cb returns nothing
+	call panCameraToTimed(unit_getPos(Character_character), unit_getPos_return_y, 0.)
+endfunction
+
+function dispatch_CallbackCounted_ClosureTimers_CallbackCounted_call takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if CallbackCounted_typeId[this_1] == 0 then
+		if this_1 == 0 then
+			call error("Nullpointer exception when calling CallbackCounted.call", "when calling error in ClosureTimers, line 149")
+		else
+			call error("Called CallbackCounted.call on invalid object.", "when calling error in ClosureTimers, line 149")
+		endif
+	endif
+	if CallbackCounted_typeId[this_1] <= 643 then
+		if CallbackCounted_typeId[this_1] <= 642 then
+			call call_doPeriodicallyCounted_ClosureTimers(this_1, cb, "when calling call_doPeriodicallyCounted_ClosureTimers in ClosureTimers, line 149")
+		else
+			call call_doPeriodicallyTimed_Razor_Razor(this_1, cb, "when calling call_doPeriodicallyTimed_Razor_Razor in ClosureTimers, line 149")
+		endif
+	else
+		call call_doPeriodicallyTimed_add_Character(this_1, cb)
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
 function CallbackCounted_callAndCount takes integer this_1, string w__wurst_stackPos returns nothing
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
@@ -2169,6 +2210,231 @@ function bridge_CallbackCounted_staticCallback takes nothing returns nothing
 	call CallbackCounted_staticCallback("via function reference ClosureTimers, line 156")
 endfunction
 
+function alloc_ForGroupCallback_forUnitsInRange_doPeriodically_Segment_Segment takes string w__wurst_stackPos returns integer
+	local integer this_1
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if ForGroupCallback_firstFree == 0 then
+		if ForGroupCallback_maxIndex < 32768 then
+			set ForGroupCallback_maxIndex = ForGroupCallback_maxIndex + 1
+			set this_1 = ForGroupCallback_maxIndex
+			set ForGroupCallback_typeId[this_1] = 676
+		else
+			call error("Out of memory: Could not create ForGroupCallback_forUnitsInRange_doPeriodically_Segment_Segment.", "when calling error in Segment, line 35")
+			set this_1 = 0
+		endif
+	else
+		set ForGroupCallback_firstFree = ForGroupCallback_firstFree - 1
+		set this_1 = ForGroupCallback_nextFree[ForGroupCallback_firstFree]
+		set ForGroupCallback_typeId[this_1] = 676
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+	return this_1
+endfunction
+
+function angle_op_mult takes real this_radians, real scalar returns real
+	set angle_op_mult_return_radians = this_radians * scalar
+	return angle_op_mult_return_radians
+endfunction
+
+function angle_op_plus takes real this_radians, real other_radians returns real
+	set angle_op_plus_return_radians = this_radians + other_radians
+	return angle_op_plus_return_radians
+endfunction
+
+function vec2_normalizedPointerTo takes real this_x, real this_y, real target_x, real target_y returns real
+	local real tuple_temp = vec2_op_minus(target_x, target_y, this_x, this_y)
+	local real tuple_temp_1 = vec2_op_minus_return_y
+	local real diff_x = tuple_temp
+	local real diff_y = tuple_temp_1
+	local real len = vec2_length(diff_x, diff_y)
+	local real tuple_temp_2
+	local real tuple_temp_3
+	local real tuple_temp_4
+	local real tuple_temp_5
+	if len > 0. then
+		set tuple_temp_2 = vec2_op_mult(diff_x, diff_y, 1. / len)
+		set tuple_temp_3 = vec2_op_mult_return_y
+		set diff_x = tuple_temp_2
+		set diff_y = tuple_temp_3
+	else
+		set tuple_temp_4 = 1.
+		set tuple_temp_5 = 0.
+		set diff_x = tuple_temp_4
+		set diff_y = tuple_temp_5
+	endif
+	set vec2_normalizedPointerTo_return_x = diff_x
+	set vec2_normalizedPointerTo_return_y = diff_y
+	return vec2_normalizedPointerTo_return_x
+endfunction
+
+function angle_cos takes real this_radians returns real
+	return Cos(this_radians)
+endfunction
+
+function angle_sin takes real this_radians returns real
+	return Sin(this_radians)
+endfunction
+
+function vec2_rotate takes real this_x, real this_y, real angl_radians returns real
+	local real c = angle_cos(angl_radians)
+	local real s = angle_sin(angl_radians)
+	local real px = this_x * c - this_y * s
+	local real py = this_x * s + this_y * c
+	set vec2_rotate_return_x = px
+	set vec2_rotate_return_y = py
+	return vec2_rotate_return_x
+endfunction
+
+function vec3_op_minus takes real this_x, real this_y, real this_z, real v_x, real v_y returns real
+	set vec3_op_minus_return_x = this_x - v_x
+	set vec3_op_minus_return_y = this_y - v_y
+	set vec3_op_minus_return_z = this_z
+	return vec3_op_minus_return_x
+endfunction
+
+function vec3_op_plus_993 takes real this_x, real this_y, real this_z, real v_x, real v_y returns real
+	set vec3_op_plus_return_x_639 = this_x + v_x
+	set vec3_op_plus_return_y_641 = this_y + v_y
+	set vec3_op_plus_return_z_643 = this_z
+	return vec3_op_plus_return_x_639
+endfunction
+
+function call_doPeriodically_Segment_Segment takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
+	local real ray_origin_x_1
+	local real ray_origin_y_1
+	local real ray_direction_x_1
+	local real ray_direction_y_1
+	local integer clVar
+	local real temp_x
+	local real temp_y
+	local real temp
+	local real tuple_temp
+	local real tuple_temp_1
+	local real tuple_temp_2
+	local real tuple_temp_3
+	local real tuple_temp_4
+	local real tuple_temp_5
+	local real tuple_temp_6
+	local real tuple_temp_7
+	local real tuple_temp_8
+	local real tuple_temp_9
+	local real tuple_temp_10
+	local real tuple_temp_11
+	local real tuple_temp_12
+	local real tuple_temp_13
+	local real tuple_temp_14
+	local real tuple_temp_15
+	local real tuple_temp_16
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	set tuple_temp = angle_op_plus(rotation_radians[this_1], angle_op_mult(angularVelocity_radians[this_1], Basics_ANIMATION_PERIOD))
+	set rotation_radians[this_1] = tuple_temp
+	set tuple_temp_1 = vec3_op_plus_993(vec2_withTerrainZ(pos_x[this_1], pos_y[this_1]), vec2_withTerrainZ_return_y, vec2_withTerrainZ_return_z, vec2_rotate(offset_x[this_1], offset_y[this_1], rotation_radians[this_1]), vec2_rotate_return_y)
+	set tuple_temp_2 = vec3_op_plus_return_y_641
+	set tuple_temp_3 = vec3_op_plus_return_z_643
+	set Segment_p1_x[this_599[this_1]] = tuple_temp_1
+	set Segment_p1_y[this_599[this_1]] = tuple_temp_2
+	set Segment_p1_z[this_599[this_1]] = tuple_temp_3
+	set tuple_temp_4 = vec3_op_minus(vec2_withTerrainZ(pos_x[this_1], pos_y[this_1]), vec2_withTerrainZ_return_y, vec2_withTerrainZ_return_z, vec2_rotate(offset_x[this_1], offset_y[this_1], rotation_radians[this_1]), vec2_rotate_return_y)
+	set tuple_temp_5 = vec3_op_minus_return_y
+	set tuple_temp_6 = vec3_op_minus_return_z
+	set Segment_p2_x[this_599[this_1]] = tuple_temp_4
+	set Segment_p2_y[this_599[this_1]] = tuple_temp_5
+	set Segment_p2_z[this_599[this_1]] = tuple_temp_6
+	call lightning_move(Segment_ltn[this_599[this_1]], false, Segment_p1_x[this_599[this_1]], Segment_p1_y[this_599[this_1]], Segment_p1_z[this_599[this_1]], Segment_p2_x[this_599[this_1]], Segment_p2_y[this_599[this_1]], Segment_p2_z[this_599[this_1]])
+	set tuple_temp_7 = vec3_toVec2(Segment_p1_x[this_599[this_1]], Segment_p1_y[this_599[this_1]], Segment_p1_z[this_599[this_1]])
+	set tuple_temp_8 = vec3_toVec2_return_y
+	set tuple_temp_9 = vec2_normalizedPointerTo(vec3_toVec2(Segment_p1_x[this_599[this_1]], Segment_p1_y[this_599[this_1]], Segment_p1_z[this_599[this_1]]), vec3_toVec2_return_y, vec3_toVec2(Segment_p2_x[this_599[this_1]], Segment_p2_y[this_599[this_1]], Segment_p2_z[this_599[this_1]]), vec3_toVec2_return_y)
+	set tuple_temp_10 = vec2_normalizedPointerTo_return_y
+	set ray_origin_x_1 = tuple_temp_7
+	set ray_origin_y_1 = tuple_temp_8
+	set ray_direction_x_1 = tuple_temp_9
+	set ray_direction_y_1 = tuple_temp_10
+	set tuple_temp_11 = pos_x[this_1]
+	set tuple_temp_12 = pos_y[this_1]
+	set temp_x = tuple_temp_11
+	set temp_y = tuple_temp_12
+	set temp = width[this_1]
+	set clVar = alloc_ForGroupCallback_forUnitsInRange_doPeriodically_Segment_Segment("when calling alloc_ForGroupCallback_forUnitsInRange_doPeriodically_Segment_Segment in Segment, line 35")
+	set tuple_temp_13 = ray_origin_x_1
+	set tuple_temp_14 = ray_origin_y_1
+	set tuple_temp_15 = ray_direction_x_1
+	set tuple_temp_16 = ray_direction_y_1
+	set ray_origin_x_501[clVar] = tuple_temp_13
+	set ray_origin_y_503[clVar] = tuple_temp_14
+	set ray_direction_x_497[clVar] = tuple_temp_15
+	set ray_direction_y_499[clVar] = tuple_temp_16
+	set width_650[clVar] = width[this_1]
+	call forUnitsInRange(temp_x, temp_y, temp, true, clVar, "when calling forUnitsInRange in Segment, line 35")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function CallbackPeriodic_onDestroy takes integer this_1, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	call timer_release(CallbackPeriodic_t[this_1], "when calling release in ClosureTimers, line 142")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function dealloc_CallbackPeriodic takes integer obj, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if CallbackPeriodic_typeId[obj] == 0 then
+		call error("Double free: object of type CallbackPeriodic", "when calling error in ClosureTimers, line 127")
+	else
+		set CallbackPeriodic_nextFree[CallbackPeriodic_firstFree] = obj
+		set CallbackPeriodic_firstFree = CallbackPeriodic_firstFree + 1
+		set CallbackPeriodic_typeId[obj] = 0
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function destroyCallbackPeriodic takes integer this_1, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	call CallbackPeriodic_onDestroy(this_1, "when calling CallbackPeriodic_onDestroy in ClosureTimers, line 141")
+	call dealloc_CallbackPeriodic(this_1, "when calling dealloc_CallbackPeriodic in ClosureTimers, line 141")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function dispatch_CallbackPeriodic_destroyCallbackPeriodic takes integer this_1, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if CallbackPeriodic_typeId[this_1] == 0 then
+		if this_1 == 0 then
+			call error("Nullpointer exception when calling CallbackPeriodic.CallbackPeriodic", "when calling error in ClosureTimers, line 127")
+		else
+			call error("Called CallbackPeriodic.CallbackPeriodic on invalid object.", "when calling error in ClosureTimers, line 127")
+		endif
+	endif
+	call destroyCallbackPeriodic(this_1, "when calling destroyCallbackPeriodic in ClosureTimers, line 127")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function lightning_setColor takes lightning this_1, integer c_red, integer c_green, integer c_blue, integer c_alpha returns boolean
+	return SetLightningColor(this_1, c_red * 1. / 255, c_green * 1. / 255, c_blue * 1. / 255, c_alpha * 1. / 255)
+endfunction
+
+function call_doPeriodically_Shield_ShieldGenerator takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	set alpha[this_1] = alpha[this_1] - 255. * 0.02
+	if alpha[this_1] > 0. then
+		call lightning_setColor(timed1[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
+		call lightning_setColor(timed2[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
+		call lightning_setColor(timed3[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
+		call lightning_setColor(timed4[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
+	else
+		call dispatch_CallbackPeriodic_destroyCallbackPeriodic(cb, "when calling dispatch_CallbackPeriodic_destroyCallbackPeriodic in ShieldGenerator, line 74")
+		call lightning_destr(timed1[this_1])
+		call lightning_destr(timed2[this_1])
+		call lightning_destr(timed3[this_1])
+		call lightning_destr(timed4[this_1])
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
 function alloc_Razor takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
@@ -2177,15 +2443,15 @@ function alloc_Razor takes string w__wurst_stackPos returns integer
 		if Razor_maxIndex < 32768 then
 			set Razor_maxIndex = Razor_maxIndex + 1
 			set this_1 = Razor_maxIndex
-			set Razor_typeId[this_1] = 751
+			set Razor_typeId[this_1] = 752
 		else
-			call error("Out of memory: Could not create Razor.", "when calling error in Razor, line 16")
+			call error("Out of memory: Could not create Razor.", "when calling error in Razor, line 17")
 			set this_1 = 0
 		endif
 	else
 		set Razor_firstFree = Razor_firstFree - 1
 		set this_1 = Razor_nextFree[Razor_firstFree]
-		set Razor_typeId[this_1] = 751
+		set Razor_typeId[this_1] = 752
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -2210,8 +2476,8 @@ function Razor_init takes integer this_1 returns nothing
 	call construct_Razor_LinkedListModule(this_1)
 endfunction
 
-function addLightning takes string codeName, boolean checkVisibility, real start_x, real start_y, real w_end_x, real w_end_y returns lightning
-	return AddLightning(codeName, checkVisibility, start_x, start_y, w_end_x, w_end_y)
+function addLightning_441 takes string codeName, boolean checkVisibility, real start_x, real start_y, real start_z, real w_end_x, real w_end_y, real w_end_z returns lightning
+	return AddLightningEx(codeName, checkVisibility, start_x, start_y, start_z, w_end_x, w_end_y, w_end_z)
 endfunction
 
 function alloc_CallbackCounted_doPeriodicallyTimed_Razor_Razor takes string w__wurst_stackPos returns integer
@@ -2224,7 +2490,7 @@ function alloc_CallbackCounted_doPeriodicallyTimed_Razor_Razor takes string w__w
 			set this_1 = CallbackCounted_maxIndex
 			set CallbackCounted_typeId[this_1] = 643
 		else
-			call error("Out of memory: Could not create CallbackCounted_doPeriodicallyTimed_Razor_Razor.", "when calling error in Razor, line 31")
+			call error("Out of memory: Could not create CallbackCounted_doPeriodicallyTimed_Razor_Razor.", "when calling error in Razor, line 34")
 			set this_1 = 0
 		endif
 	else
@@ -2331,6 +2597,7 @@ function doPeriodicallyTimed takes real interval, real timerDuration, integer cb
 endfunction
 
 function construct_Razor takes integer this_1, real p1_x, real p1_y, real p2_x, real p2_y, real direction_x, real direction_y, real speed, real lifetime, string w__wurst_stackPos returns nothing
+	local real posBetween_z
 	local integer clVar
 	local real temp
 	local real temp_1
@@ -2340,6 +2607,7 @@ function construct_Razor takes integer this_1, real p1_x, real p1_y, real p2_x, 
 	local real tuple_temp_3
 	local real tuple_temp_4
 	local real tuple_temp_5
+	local real tuple_temp_6
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	call Razor_init(this_1)
@@ -2355,14 +2623,17 @@ function construct_Razor takes integer this_1, real p1_x, real p1_y, real p2_x, 
 	set tuple_temp_5 = p2_y
 	set Razor_p2_x[this_1] = tuple_temp_4
 	set Razor_p2_y[this_1] = tuple_temp_5
-	set Razor_ltn[this_1] = addLightning(Lightning_LIGHTNING_CHAIN_LIGHTNING_PRIMARY, false, p1_x, p1_y, p2_x, p2_y)
+	call vec2_withTerrainZ(vec2_op_plus(p1_x, p1_y, vec2_op_mult(vec2_op_minus(p2_x, p2_y, p1_x, p1_y), vec2_op_minus_return_y, 0.5), vec2_op_mult_return_y), vec2_op_plus_return_y)
+	set tuple_temp_6 = vec2_withTerrainZ_return_z
+	set posBetween_z = tuple_temp_6
+	set Razor_ltn[this_1] = addLightning_441(Lightning_LIGHTNING_CHAIN_LIGHTNING_PRIMARY, false, vec2_withZ(p1_x, p1_y, posBetween_z), vec2_withZ_return_y, vec2_withZ_return_z, vec2_withZ(p2_x, p2_y, posBetween_z), vec2_withZ_return_y, vec2_withZ_return_z)
 	set Razor_speed[this_1] = speed
 	set temp = Basics_ANIMATION_PERIOD
 	set temp_1 = lifetime
-	set clVar = alloc_CallbackCounted_doPeriodicallyTimed_Razor_Razor("when calling alloc_CallbackCounted_doPeriodicallyTimed_Razor_Razor in Razor, line 31")
+	set clVar = alloc_CallbackCounted_doPeriodicallyTimed_Razor_Razor("when calling alloc_CallbackCounted_doPeriodicallyTimed_Razor_Razor in Razor, line 34")
 	call construct_CallbackCounted(clVar)
 	set this[clVar] = this_1
-	call doPeriodicallyTimed(temp, temp_1, clVar, "when calling doPeriodicallyTimed in Razor, line 31")
+	set Razor_tim[this_1] = doPeriodicallyTimed(temp, temp_1, clVar, "when calling doPeriodicallyTimed in Razor, line 34")
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
@@ -2370,8 +2641,8 @@ function new_Razor takes real p1_x, real p1_y, real p2_x, real p2_y, real direct
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_Razor("when calling alloc_Razor in Razor, line 25")
-	call construct_Razor(this_1, p1_x, p1_y, p2_x, p2_y, direction_x, direction_y, speed, lifetime, "when calling construct_Razor in Razor, line 25")
+	set this_1 = alloc_Razor("when calling alloc_Razor in Razor, line 27")
+	call construct_Razor(this_1, p1_x, p1_y, p2_x, p2_y, direction_x, direction_y, speed, lifetime, "when calling construct_Razor in Razor, line 27")
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
@@ -2384,15 +2655,15 @@ function alloc_RazorRed takes string w__wurst_stackPos returns integer
 		if Razor_maxIndex < 32768 then
 			set Razor_maxIndex = Razor_maxIndex + 1
 			set this_1 = Razor_maxIndex
-			set Razor_typeId[this_1] = 752
+			set Razor_typeId[this_1] = 753
 		else
-			call error("Out of memory: Could not create RazorRed.", "when calling error in Razor, line 72")
+			call error("Out of memory: Could not create RazorRed.", "when calling error in Razor, line 77")
 			set this_1 = 0
 		endif
 	else
 		set Razor_firstFree = Razor_firstFree - 1
 		set this_1 = Razor_nextFree[Razor_firstFree]
-		set Razor_typeId[this_1] = 752
+		set Razor_typeId[this_1] = 753
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -2401,10 +2672,14 @@ endfunction
 function RazorRed_init takes integer this_1 returns nothing
 endfunction
 
+function addLightning takes string codeName, boolean checkVisibility, real start_x, real start_y, real w_end_x, real w_end_y returns lightning
+	return AddLightning(codeName, checkVisibility, start_x, start_y, w_end_x, w_end_y)
+endfunction
+
 function construct_RazorRed takes integer this_1, real p1_x, real p1_y, real p2_x, real p2_y, real direction_x, real direction_y, real speed, real lifetime, string w__wurst_stackPos returns nothing
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	call construct_Razor(this_1, p1_x, p1_y, p2_x, p2_y, direction_x, direction_y, speed, lifetime, "when calling construct_Razor in Razor, line 73")
+	call construct_Razor(this_1, p1_x, p1_y, p2_x, p2_y, direction_x, direction_y, speed, lifetime, "when calling construct_Razor in Razor, line 78")
 	call RazorRed_init(this_1)
 	call lightning_destr(Razor_ltn[this_1])
 	set Razor_ltn[this_1] = addLightning(Lightning_LIGHTNING_FINGER_OF_DEATH, false, p1_x, p1_y, p2_x, p2_y)
@@ -2416,57 +2691,13 @@ function new_RazorRed takes real p1_x, real p1_y, real p2_x, real p2_y, real dir
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_RazorRed("when calling alloc_RazorRed in Razor, line 73")
-	call construct_RazorRed(this_1, p1_x, p1_y, p2_x, p2_y, direction_x, direction_y, speed, lifetime, "when calling construct_RazorRed in Razor, line 73")
+	set this_1 = alloc_RazorRed("when calling alloc_RazorRed in Razor, line 78")
+	call construct_RazorRed(this_1, p1_x, p1_y, p2_x, p2_y, direction_x, direction_y, speed, lifetime, "when calling construct_RazorRed in Razor, line 78")
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
-function vec2_normalizedPointerTo takes real this_x, real this_y, real target_x, real target_y returns real
-	local real tuple_temp = vec2_op_minus(target_x, target_y, this_x, this_y)
-	local real tuple_temp_1 = vec2_op_minus_return_y
-	local real diff_x = tuple_temp
-	local real diff_y = tuple_temp_1
-	local real len = vec2_length(diff_x, diff_y)
-	local real tuple_temp_2
-	local real tuple_temp_3
-	local real tuple_temp_4
-	local real tuple_temp_5
-	if len > 0. then
-		set tuple_temp_2 = vec2_op_mult(diff_x, diff_y, 1. / len)
-		set tuple_temp_3 = vec2_op_mult_return_y
-		set diff_x = tuple_temp_2
-		set diff_y = tuple_temp_3
-	else
-		set tuple_temp_4 = 1.
-		set tuple_temp_5 = 0.
-		set diff_x = tuple_temp_4
-		set diff_y = tuple_temp_5
-	endif
-	set vec2_normalizedPointerTo_return_x = diff_x
-	set vec2_normalizedPointerTo_return_y = diff_y
-	return vec2_normalizedPointerTo_return_x
-endfunction
-
-function angle_cos takes real this_radians returns real
-	return Cos(this_radians)
-endfunction
-
-function angle_sin takes real this_radians returns real
-	return Sin(this_radians)
-endfunction
-
-function vec2_rotate takes real this_x, real this_y, real angl_radians returns real
-	local real c = angle_cos(angl_radians)
-	local real s = angle_sin(angl_radians)
-	local real px = this_x * c - this_y * s
-	local real py = this_x * s + this_y * c
-	set vec2_rotate_return_x = px
-	set vec2_rotate_return_y = py
-	return vec2_rotate_return_x
-endfunction
-
-function call_doPeriodically_Razor takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
+function call_doPeriodically_addAction_Razor takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
 	local real dir_x
 	local real dir_y
 	local integer temp
@@ -2505,7 +2736,7 @@ function call_doPeriodically_Razor takes integer this_1, integer cb, string w__w
 		set tuple_temp_5 = vec2_op_minus_return_y
 		set p2_x = tuple_temp_4
 		set p2_y = tuple_temp_5
-		call new_Razor(p1_x, p1_y, p2_x, p2_y, dir_x, dir_y, Razor_SPEED, vec2_distanceTo(Razor_START_POS_x, Razor_START_POS_y, Razor_FINISH_POS_x, Razor_FINISH_POS_y) / Razor_SPEED, "when calling new_Razor in Razor, line 90")
+		call new_Razor(p1_x, p1_y, p2_x, p2_y, dir_x, dir_y, Razor_SPEED, vec2_distanceTo(Razor_START_POS_x, Razor_START_POS_y, Razor_FINISH_POS_x, Razor_FINISH_POS_y) / Razor_SPEED, "when calling new_Razor in Razor, line 101")
 	elseif temp == -1 then
 		set tuple_temp_6 = vec2_op_minus(Razor_START_POS_x, Razor_START_POS_y, vec2_op_mult(vec2_op_mult(vec2_rotate(dir_x, dir_y, Maths_PI * 0.5), vec2_rotate_return_y, Razor_WIDTH), vec2_op_mult_return_y, 0.5), vec2_op_mult_return_y)
 		set tuple_temp_7 = vec2_op_minus_return_y
@@ -2515,72 +2746,7 @@ function call_doPeriodically_Razor takes integer this_1, integer cb, string w__w
 		set tuple_temp_9 = vec2_op_plus_return_y
 		set p2_x_1 = tuple_temp_8
 		set p2_y_1 = tuple_temp_9
-		call new_RazorRed(p1_x_1, p1_y_1, p2_x_1, p2_y_1, dir_x, dir_y, Razor_SPEED, vec2_distanceTo(Razor_START_POS_x, Razor_START_POS_y, Razor_FINISH_POS_x, Razor_FINISH_POS_y) / Razor_SPEED, "when calling new_RazorRed in Razor, line 94")
-	endif
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function CallbackPeriodic_onDestroy takes integer this_1, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	call timer_release(CallbackPeriodic_t[this_1], "when calling release in ClosureTimers, line 142")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function dealloc_CallbackPeriodic takes integer obj, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if CallbackPeriodic_typeId[obj] == 0 then
-		call error("Double free: object of type CallbackPeriodic", "when calling error in ClosureTimers, line 127")
-	else
-		set CallbackPeriodic_nextFree[CallbackPeriodic_firstFree] = obj
-		set CallbackPeriodic_firstFree = CallbackPeriodic_firstFree + 1
-		set CallbackPeriodic_typeId[obj] = 0
-	endif
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function destroyCallbackPeriodic takes integer this_1, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	call CallbackPeriodic_onDestroy(this_1, "when calling CallbackPeriodic_onDestroy in ClosureTimers, line 141")
-	call dealloc_CallbackPeriodic(this_1, "when calling dealloc_CallbackPeriodic in ClosureTimers, line 141")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function dispatch_CallbackPeriodic_destroyCallbackPeriodic takes integer this_1, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if CallbackPeriodic_typeId[this_1] == 0 then
-		if this_1 == 0 then
-			call error("Nullpointer exception when calling CallbackPeriodic.CallbackPeriodic", "when calling error in ClosureTimers, line 127")
-		else
-			call error("Called CallbackPeriodic.CallbackPeriodic on invalid object.", "when calling error in ClosureTimers, line 127")
-		endif
-	endif
-	call destroyCallbackPeriodic(this_1, "when calling destroyCallbackPeriodic in ClosureTimers, line 127")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function lightning_setColor takes lightning this_1, integer c_red, integer c_green, integer c_blue, integer c_alpha returns boolean
-	return SetLightningColor(this_1, c_red * 1. / 255, c_green * 1. / 255, c_blue * 1. / 255, c_alpha * 1. / 255)
-endfunction
-
-function call_doPeriodically_Shield_ShieldGenerator takes integer this_1, integer cb, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	set alpha[this_1] = alpha[this_1] - 255. * 0.02
-	if alpha[this_1] > 0. then
-		call lightning_setColor(timed1[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
-		call lightning_setColor(timed2[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
-		call lightning_setColor(timed3[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
-		call lightning_setColor(timed4[this_1], 255, 255, 255, real_toInt(alpha[this_1]))
-	else
-		call dispatch_CallbackPeriodic_destroyCallbackPeriodic(cb, "when calling dispatch_CallbackPeriodic_destroyCallbackPeriodic in ShieldGenerator, line 74")
-		call lightning_destr(timed1[this_1])
-		call lightning_destr(timed2[this_1])
-		call lightning_destr(timed3[this_1])
-		call lightning_destr(timed4[this_1])
+		call new_RazorRed(p1_x_1, p1_y_1, p2_x_1, p2_y_1, dir_x, dir_y, Razor_SPEED, vec2_distanceTo(Razor_START_POS_x, Razor_START_POS_y, Razor_FINISH_POS_x, Razor_FINISH_POS_y) / Razor_SPEED, "when calling new_RazorRed in Razor, line 105")
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
@@ -2595,10 +2761,14 @@ function dispatch_CallbackPeriodic_ClosureTimers_CallbackPeriodic_call takes int
 			call error("Called CallbackPeriodic.call on invalid object.", "when calling error in ClosureTimers, line 130")
 		endif
 	endif
-	if CallbackPeriodic_typeId[this_1] <= 646 then
-		call call_doPeriodically_Razor(this_1, cb, "when calling call_doPeriodically_Razor in ClosureTimers, line 130")
+	if CallbackPeriodic_typeId[this_1] <= 647 then
+		if CallbackPeriodic_typeId[this_1] <= 646 then
+			call call_doPeriodically_Segment_Segment(this_1, cb, "when calling call_doPeriodically_Segment_Segment in ClosureTimers, line 130")
+		else
+			call call_doPeriodically_Shield_ShieldGenerator(this_1, cb, "when calling call_doPeriodically_Shield_ShieldGenerator in ClosureTimers, line 130")
+		endif
 	else
-		call call_doPeriodically_Shield_ShieldGenerator(this_1, cb, "when calling call_doPeriodically_Shield_ShieldGenerator in ClosureTimers, line 130")
+		call call_doPeriodically_addAction_Razor(this_1, cb, "when calling call_doPeriodically_addAction_Razor in ClosureTimers, line 130")
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
@@ -2651,7 +2821,7 @@ function alloc_CallbackSingle_doAfter_add_Character takes string w__wurst_stackP
 		if CallbackSingle_maxIndex < 32768 then
 			set CallbackSingle_maxIndex = CallbackSingle_maxIndex + 1
 			set this_1 = CallbackSingle_maxIndex
-			set CallbackSingle_typeId[this_1] = 653
+			set CallbackSingle_typeId[this_1] = 654
 		else
 			call error("Out of memory: Could not create CallbackSingle_doAfter_add_Character.", "when calling error in Character, line 65")
 			set this_1 = 0
@@ -2659,7 +2829,7 @@ function alloc_CallbackSingle_doAfter_add_Character takes string w__wurst_stackP
 	else
 		set CallbackSingle_firstFree = CallbackSingle_firstFree - 1
 		set this_1 = CallbackSingle_nextFree[CallbackSingle_firstFree]
-		set CallbackSingle_typeId[this_1] = 653
+		set CallbackSingle_typeId[this_1] = 654
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -2773,11 +2943,11 @@ function rect_getCenter takes rect this_1 returns real
 	return rect_getCenter_return_x
 endfunction
 
-function unit_setPos takes unit this_1, real pos_x, real pos_y returns nothing
-	call SetUnitPosition(this_1, pos_x, pos_y)
+function unit_setPos takes unit this_1, real pos_x_1, real pos_y_1 returns nothing
+	call SetUnitPosition(this_1, pos_x_1, pos_y_1)
 endfunction
 
-function onEvent_add_Character_866 takes integer this_1 returns nothing
+function onEvent_add_Character_864 takes integer this_1 returns nothing
 	if EventData_getChatMessage() == "goToCheckpoint" then
 		call unit_setPos(Character_character, rect_getCenter(gg_rct_Checkpoint), rect_getCenter_return_y)
 	endif
@@ -2800,7 +2970,7 @@ function unit_removeAbility takes unit this_1, integer abil returns boolean
 	return UnitRemoveAbility(this_1, abil)
 endfunction
 
-function onEvent_add_ShieldGenerator_868 takes integer this_1 returns nothing
+function onEvent_add_ShieldGenerator_866 takes integer this_1 returns nothing
 	call unit_removeAbility(EventData_getTriggerUnit(), ShieldGenerator_ABOVE_SHIELD_ID)
 	call unit_removeAbility(EventData_getTriggerUnit(), ShieldGenerator_FRONT_SHIELD_ID)
 endfunction
@@ -2886,7 +3056,7 @@ endfunction
 function onEvent_add_onCast_ShieldGenerator takes integer this_1, string w__wurst_stackPos returns nothing
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	if EventData_getSpellAbilityId() == id_482[this_1] and EventData_getTriggerUnit() == caster_455[this_1] then
+	if EventData_getSpellAbilityId() == id_479[this_1] and EventData_getTriggerUnit() == caster_453[this_1] then
 		call dispatch_Shield_destroyShield(shield[this_1], "when calling dispatch_Shield_destroyShield in ShieldGenerator, line 168")
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
@@ -2902,18 +3072,18 @@ function dispatch_EventListener_ClosureEvents_EventListener_onEvent takes intege
 			call error("Called EventListener.onEvent on invalid object.", "when calling error in ClosureEvents, line 110")
 		endif
 	endif
-	if EventListener_typeId[this_1] <= 666 then
-		if EventListener_typeId[this_1] <= 665 then
-			if EventListener_typeId[this_1] <= 664 then
+	if EventListener_typeId[this_1] <= 667 then
+		if EventListener_typeId[this_1] <= 666 then
+			if EventListener_typeId[this_1] <= 665 then
 				call onEvent_add_Character(this_1, "when calling onEvent_add_Character in ClosureEvents, line 110")
 			else
-				call onEvent_add_Character_866(this_1)
+				call onEvent_add_Character_864(this_1)
 			endif
 		else
 			call onEvent_add_ShieldGenerator(this_1)
 		endif
-	elseif EventListener_typeId[this_1] <= 667 then
-		call onEvent_add_ShieldGenerator_868(this_1)
+	elseif EventListener_typeId[this_1] <= 668 then
+		call onEvent_add_ShieldGenerator_866(this_1)
 	else
 		call onEvent_add_onCast_ShieldGenerator(this_1, "when calling onEvent_add_onCast_ShieldGenerator in ClosureEvents, line 110")
 	endif
@@ -2947,7 +3117,7 @@ function trigger_registerPlayerUnitEvent takes trigger this_1, player whichPlaye
 	return TriggerRegisterPlayerUnitEvent(this_1, whichPlayer, whichPlayerUnitEvent, filter)
 endfunction
 
-function registerPlayerUnitEvent_911 takes playerunitevent p, code filter, code condition, code action returns nothing
+function registerPlayerUnitEvent_909 takes playerunitevent p, code filter, code condition, code action returns nothing
 	local integer hid = handle_getHandleId(p)
 	local integer k
 	local filterfunc cond_result
@@ -2984,7 +3154,7 @@ function registerPlayerUnitEvent_911 takes playerunitevent p, code filter, code 
 endfunction
 
 function registerPlayerUnitEvent takes playerunitevent p, code c returns nothing
-	call registerPlayerUnitEvent_911(p, null, c, null)
+	call registerPlayerUnitEvent_909(p, null, c, null)
 endfunction
 
 function trigger_registerPlayerEvent takes trigger this_1, player whichPlayer, playerevent whichPlayerEvent returns event
@@ -3096,125 +3266,6 @@ function bridge_EventListener_generalEventCallback takes nothing returns nothing
 	call EventListener_generalEventCallback("via function reference ClosureEvents, line 245")
 endfunction
 
-function alloc_ForGroupCallback_forUnitsInRange_Segment_Segment takes string w__wurst_stackPos returns integer
-	local integer this_1
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if ForGroupCallback_firstFree == 0 then
-		if ForGroupCallback_maxIndex < 32768 then
-			set ForGroupCallback_maxIndex = ForGroupCallback_maxIndex + 1
-			set this_1 = ForGroupCallback_maxIndex
-			set ForGroupCallback_typeId[this_1] = 675
-		else
-			call error("Out of memory: Could not create ForGroupCallback_forUnitsInRange_Segment_Segment.", "when calling error in Segment, line 43")
-			set this_1 = 0
-		endif
-	else
-		set ForGroupCallback_firstFree = ForGroupCallback_firstFree - 1
-		set this_1 = ForGroupCallback_nextFree[ForGroupCallback_firstFree]
-		set ForGroupCallback_typeId[this_1] = 675
-	endif
-	set wurst_stack_depth = wurst_stack_depth - 1
-	return this_1
-endfunction
-
-function angle_op_mult takes real this_radians, real scalar returns real
-	set angle_op_mult_return_radians = this_radians * scalar
-	return angle_op_mult_return_radians
-endfunction
-
-function lightning_move_839 takes lightning this_1, boolean checkVisibility, real start_x, real start_y, real start_z, real w_end_x, real w_end_y, real w_end_z returns boolean
-	return MoveLightningEx(this_1, checkVisibility, start_x, start_y, start_z, w_end_x, w_end_y, w_end_z)
-endfunction
-
-function vec2_toVec3 takes real this_x, real this_y returns real
-	set vec2_toVec3_return_x = this_x
-	set vec2_toVec3_return_y = this_y
-	set vec2_toVec3_return_z = 0.
-	return vec2_toVec3_return_x
-endfunction
-
-function Segment_update takes integer this_1, real delay, string w__wurst_stackPos returns nothing
-	local real a_radians
-	local integer clVar
-	local real temp_x
-	local real temp_y
-	local real temp
-	local real tuple_temp
-	local real tuple_temp_1
-	local real tuple_temp_2
-	local real tuple_temp_3
-	local real tuple_temp_4
-	local real tuple_temp_5
-	local real tuple_temp_6
-	local real tuple_temp_7
-	local real tuple_temp_8
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	set tuple_temp = angle_op_mult(Segment_angularVelocity_radians[this_1], delay)
-	set a_radians = tuple_temp
-	set tuple_temp_1 = vec2_toVec3(vec2_rotate(vec3_toVec2(Segment_p1_x[this_1], Segment_p1_y[this_1], Segment_p1_z[this_1]), vec3_toVec2_return_y, a_radians), vec2_rotate_return_y)
-	set tuple_temp_2 = vec2_toVec3_return_y
-	set tuple_temp_3 = vec2_toVec3_return_z
-	set Segment_p1_x[this_1] = tuple_temp_1
-	set Segment_p1_y[this_1] = tuple_temp_2
-	set Segment_p1_z[this_1] = tuple_temp_3
-	set tuple_temp_4 = vec2_toVec3(vec2_rotate(vec3_toVec2(Segment_p2_x[this_1], Segment_p2_y[this_1], Segment_p2_z[this_1]), vec3_toVec2_return_y, a_radians), vec2_rotate_return_y)
-	set tuple_temp_5 = vec2_toVec3_return_y
-	set tuple_temp_6 = vec2_toVec3_return_z
-	set Segment_p2_x[this_1] = tuple_temp_4
-	set Segment_p2_y[this_1] = tuple_temp_5
-	set Segment_p2_z[this_1] = tuple_temp_6
-	call lightning_move_839(Segment_light[this_1], false, vec3_op_plus(Segment_pos_x[this_1], Segment_pos_y[this_1], Segment_pos_z[this_1], Segment_p1_x[this_1], Segment_p1_y[this_1], Segment_p1_z[this_1]), vec3_op_plus_return_y, vec3_op_plus_return_z, vec3_op_plus(Segment_pos_x[this_1], Segment_pos_y[this_1], Segment_pos_z[this_1], Segment_p2_x[this_1], Segment_p2_y[this_1], Segment_p2_z[this_1]), vec3_op_plus_return_y, vec3_op_plus_return_z)
-	set tuple_temp_7 = vec3_toVec2(Segment_pos_x[this_1], Segment_pos_y[this_1], Segment_pos_z[this_1])
-	set tuple_temp_8 = vec3_toVec2_return_y
-	set temp_x = tuple_temp_7
-	set temp_y = tuple_temp_8
-	set temp = Segment_width[this_1]
-	set clVar = alloc_ForGroupCallback_forUnitsInRange_Segment_Segment("when calling alloc_ForGroupCallback_forUnitsInRange_Segment_Segment in Segment, line 43")
-	set this_593[clVar] = this_1
-	call forUnitsInRange(temp_x, temp_y, temp, true, clVar, "when calling forUnitsInRange in Segment, line 43")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function dispatch_Segment_Segment_Segment_update takes integer this_1, real delay, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if Segment_typeId[this_1] == 0 then
-		if this_1 == 0 then
-			call error("Nullpointer exception when calling Segment.update", "when calling error in Segment, line 38")
-		else
-			call error("Called Segment.update on invalid object.", "when calling error in Segment, line 38")
-		endif
-	endif
-	call Segment_update(this_1, delay, "when calling update in Segment, line 38")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function timer_getElapsed takes timer this_1 returns real
-	return TimerGetElapsed(this_1)
-endfunction
-
-function Segment_updateAll takes string w__wurst_stackPos returns nothing
-	local integer iterator
-	local integer s
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	set iterator = Segment_LinkedListModule_iterator("when calling iterator in Segment, line 35")
-	loop
-		exitwhen  not Iterator_hasNext(iterator)
-		set s = Iterator_next(iterator)
-		call dispatch_Segment_Segment_Segment_update(s, timer_getElapsed(Segment_clock), "when calling update in Segment, line 36")
-	endloop
-	call Iterator_close(iterator, "when calling close in Segment, line 35")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function bridge_Segment_updateAll takes nothing returns nothing
-	set wurst_stack_depth = 0
-	call Segment_updateAll("via function reference Segment, line 24")
-endfunction
-
 function currentCallbackD takes nothing returns integer
 	return ClosureForGroups_tempCallbacksD[ClosureForGroups_tempCallbacksDCount - 1]
 endfunction
@@ -3249,15 +3300,15 @@ function alloc_Segment takes string w__wurst_stackPos returns integer
 		if Segment_maxIndex < 32768 then
 			set Segment_maxIndex = Segment_maxIndex + 1
 			set this_1 = Segment_maxIndex
-			set Segment_typeId[this_1] = 760
+			set Segment_typeId[this_1] = 761
 		else
-			call error("Out of memory: Could not create Segment.", "when calling error in Segment, line 13")
+			call error("Out of memory: Could not create Segment.", "when calling error in Segment, line 16")
 			set this_1 = 0
 		endif
 	else
 		set Segment_firstFree = Segment_firstFree - 1
 		set this_1 = Segment_nextFree[Segment_firstFree]
-		set Segment_typeId[this_1] = 760
+		set Segment_typeId[this_1] = 761
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -3278,11 +3329,87 @@ function Segment_init takes integer this_1 returns nothing
 	call construct_Segment_LinkedListModule(this_1)
 endfunction
 
-function addLightning_445 takes string codeName, boolean checkVisibility, real start_x, real start_y, real start_z, real w_end_x, real w_end_y, real w_end_z returns lightning
-	return AddLightningEx(codeName, checkVisibility, start_x, start_y, start_z, w_end_x, w_end_y, w_end_z)
+function alloc_CallbackPeriodic_doPeriodically_Segment_Segment takes string w__wurst_stackPos returns integer
+	local integer this_1
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if CallbackPeriodic_firstFree == 0 then
+		if CallbackPeriodic_maxIndex < 32768 then
+			set CallbackPeriodic_maxIndex = CallbackPeriodic_maxIndex + 1
+			set this_1 = CallbackPeriodic_maxIndex
+			set CallbackPeriodic_typeId[this_1] = 646
+		else
+			call error("Out of memory: Could not create CallbackPeriodic_doPeriodically_Segment_Segment.", "when calling error in Segment, line 29")
+			set this_1 = 0
+		endif
+	else
+		set CallbackPeriodic_firstFree = CallbackPeriodic_firstFree - 1
+		set this_1 = CallbackPeriodic_nextFree[CallbackPeriodic_firstFree]
+		set CallbackPeriodic_typeId[this_1] = 646
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+	return this_1
 endfunction
 
-function construct_Segment takes integer this_1, real pos_x, real pos_y, real pos_z, real width, real angularVelocity_radians_1 returns nothing
+function CallbackPeriodic_init takes integer this_1 returns nothing
+endfunction
+
+function construct_CallbackPeriodic takes integer this_1 returns nothing
+	call CallbackPeriodic_init(this_1)
+endfunction
+
+function CallbackPeriodic_start takes integer this_1, timer whichTimer, real time, string w__wurst_stackPos returns nothing
+	local timer receiver
+	local timer receiver_1
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	set receiver = whichTimer
+	call timer_setData(receiver, this_1, "when calling setData in ClosureTimers, line 134")
+	set receiver_1 = receiver
+	call timer_startPeriodic(receiver_1, time, ref_function_bridge_CallbackPeriodic_staticCallback)
+	set CallbackPeriodic_t[this_1] = receiver_1
+	set wurst_stack_depth = wurst_stack_depth - 1
+	set receiver = null
+	set receiver_1 = null
+endfunction
+
+function dispatch_CallbackPeriodic_ClosureTimers_CallbackPeriodic_start takes integer this_1, timer whichTimer, real time, string w__wurst_stackPos returns nothing
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if CallbackPeriodic_typeId[this_1] == 0 then
+		if this_1 == 0 then
+			call error("Nullpointer exception when calling CallbackPeriodic.start", "when calling error in ClosureTimers, line 132")
+		else
+			call error("Called CallbackPeriodic.start on invalid object.", "when calling error in ClosureTimers, line 132")
+		endif
+	endif
+	call CallbackPeriodic_start(this_1, whichTimer, time, "when calling start in ClosureTimers, line 132")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function timer_doPeriodically takes timer this_1, real time, integer cb, string w__wurst_stackPos returns integer
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	call dispatch_CallbackPeriodic_ClosureTimers_CallbackPeriodic_start(cb, this_1, time, "when calling start in ClosureTimers, line 45")
+	set wurst_stack_depth = wurst_stack_depth - 1
+	return cb
+endfunction
+
+function doPeriodically takes real time, integer cb, string w__wurst_stackPos returns integer
+	local integer stackTrace_tempReturn
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	set stackTrace_tempReturn = timer_doPeriodically(getTimer("when calling getTimer in ClosureTimers, line 57"), time, cb, "when calling doPeriodically in ClosureTimers, line 57")
+	set wurst_stack_depth = wurst_stack_depth - 1
+	return stackTrace_tempReturn
+endfunction
+
+function construct_Segment takes integer this_1, real pos_x_1, real pos_y_1, real width_1, real angularVelocity_radians_1, string w__wurst_stackPos returns nothing
+	local real rotation_radians_1
+	local real offset_x_1
+	local real offset_y_1
+	local integer clVar
+	local real temp
 	local real tuple_temp
 	local real tuple_temp_1
 	local real tuple_temp_2
@@ -3293,61 +3420,73 @@ function construct_Segment takes integer this_1, real pos_x, real pos_y, real po
 	local real tuple_temp_7
 	local real tuple_temp_8
 	local real tuple_temp_9
+	local real tuple_temp_10
+	local real tuple_temp_11
+	local real tuple_temp_12
+	local real tuple_temp_13
+	local real tuple_temp_14
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
 	call Segment_init(this_1)
-	set tuple_temp = pos_x
-	set tuple_temp_1 = pos_y
-	set tuple_temp_2 = pos_z
-	set Segment_pos_x[this_1] = tuple_temp
-	set Segment_pos_y[this_1] = tuple_temp_1
-	set Segment_pos_z[this_1] = tuple_temp_2
-	set tuple_temp_3 = width / 2.
-	set tuple_temp_4 = 0.
-	set tuple_temp_5 = 0.
+	set tuple_temp = 0.
+	set rotation_radians_1 = tuple_temp
+	set tuple_temp_1 = width_1 / 2.
+	set tuple_temp_2 = 0.
+	set offset_x_1 = tuple_temp_1
+	set offset_y_1 = tuple_temp_2
+	set tuple_temp_3 = vec3_op_plus_993(vec2_withTerrainZ(pos_x_1, pos_y_1), vec2_withTerrainZ_return_y, vec2_withTerrainZ_return_z, offset_x_1, offset_y_1)
+	set tuple_temp_4 = vec3_op_plus_return_y_641
+	set tuple_temp_5 = vec3_op_plus_return_z_643
 	set Segment_p1_x[this_1] = tuple_temp_3
 	set Segment_p1_y[this_1] = tuple_temp_4
 	set Segment_p1_z[this_1] = tuple_temp_5
-	set tuple_temp_6 =  - (width / 2.)
-	set tuple_temp_7 = 0.
-	set tuple_temp_8 = 0.
+	set tuple_temp_6 = vec3_op_minus(vec2_withTerrainZ(pos_x_1, pos_y_1), vec2_withTerrainZ_return_y, vec2_withTerrainZ_return_z, offset_x_1, offset_y_1)
+	set tuple_temp_7 = vec3_op_minus_return_y
+	set tuple_temp_8 = vec3_op_minus_return_z
 	set Segment_p2_x[this_1] = tuple_temp_6
 	set Segment_p2_y[this_1] = tuple_temp_7
 	set Segment_p2_z[this_1] = tuple_temp_8
-	set Segment_width[this_1] = width
-	set Segment_light[this_1] = addLightning_445(Segment_lightType, false, vec3_op_plus(pos_x, pos_y, pos_z, Segment_p1_x[this_1], Segment_p1_y[this_1], Segment_p1_z[this_1]), vec3_op_plus_return_y, vec3_op_plus_return_z, vec3_op_plus(pos_x, pos_y, pos_z, Segment_p2_x[this_1], Segment_p2_y[this_1], Segment_p2_z[this_1]), vec3_op_plus_return_y, vec3_op_plus_return_z)
-	set tuple_temp_9 = angularVelocity_radians_1
-	set Segment_angularVelocity_radians[this_1] = tuple_temp_9
+	set Segment_ltn[this_1] = addLightning_441(Segment_LIGHTNING_TYPE, false, Segment_p1_x[this_1], Segment_p1_y[this_1], Segment_p1_z[this_1], Segment_p2_x[this_1], Segment_p2_y[this_1], Segment_p2_z[this_1])
+	set temp = Basics_ANIMATION_PERIOD
+	set clVar = alloc_CallbackPeriodic_doPeriodically_Segment_Segment("when calling alloc_CallbackPeriodic_doPeriodically_Segment_Segment in Segment, line 29")
+	call construct_CallbackPeriodic(clVar)
+	set tuple_temp_9 = rotation_radians_1
+	set rotation_radians[clVar] = tuple_temp_9
+	set tuple_temp_10 = angularVelocity_radians_1
+	set angularVelocity_radians[clVar] = tuple_temp_10
+	set this_599[clVar] = this_1
+	set tuple_temp_11 = pos_x_1
+	set tuple_temp_12 = pos_y_1
+	set pos_x[clVar] = tuple_temp_11
+	set pos_y[clVar] = tuple_temp_12
+	set tuple_temp_13 = offset_x_1
+	set tuple_temp_14 = offset_y_1
+	set offset_x[clVar] = tuple_temp_13
+	set offset_y[clVar] = tuple_temp_14
+	set width[clVar] = width_1
+	call doPeriodically(temp, clVar, "when calling doPeriodically in Segment, line 29")
+	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
-function new_Segment takes real pos_x, real pos_y, real pos_z, real width, real angularVelocity_radians_1, string w__wurst_stackPos returns integer
+function new_Segment takes real pos_x_1, real pos_y_1, real width_1, real angularVelocity_radians_1, string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_Segment("when calling alloc_Segment in Segment, line 26")
-	call construct_Segment(this_1, pos_x, pos_y, pos_z, width, angularVelocity_radians_1)
+	set this_1 = alloc_Segment("when calling alloc_Segment in Segment, line 23")
+	call construct_Segment(this_1, pos_x_1, pos_y_1, width_1, angularVelocity_radians_1, "when calling construct_Segment in Segment, line 23")
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
-function vec2_getTerrainZ takes real this_x, real this_y returns real
-	call MoveLocation(Vectors_tempLoc, this_x, this_y)
-	return GetLocationZ(Vectors_tempLoc)
-endfunction
-
-function vec2_withTerrainZ takes real this_x, real this_y returns real
-	set vec2_withTerrainZ_return_x = this_x
-	set vec2_withTerrainZ_return_y = this_y
-	set vec2_withTerrainZ_return_z = vec2_getTerrainZ(this_x, this_y)
-	return vec2_withTerrainZ_return_x
-endfunction
-
 function callback_forDestructablesInRect_Segment takes integer this_1, destructable d, string w__wurst_stackPos returns nothing
-	local real tuple_temp
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	if destructable_getTypeId(d) == 1280598642 then
-		set tuple_temp = angle_op_mult(angularVelocity_radians[this_1], -1)
-		set angularVelocity_radians[this_1] = tuple_temp
-		call new_Segment(vec2_withTerrainZ(destructable_getPos(d), destructable_getPos_return_y), vec2_withTerrainZ_return_y, vec2_withTerrainZ_return_z, 400., angularVelocity_radians[this_1], "when calling new_Segment in Segment, line 61")
+		if GetRandomInt(0, 1) == 0 then
+			call new_Segment(destructable_getPos(d), destructable_getPos_return_y, Segment_WIDTH, Segment_VELOCITY_radians, "when calling new_Segment in Segment, line 57")
+		else
+			call new_Segment(destructable_getPos(d), destructable_getPos_return_y, Segment_WIDTH, angle_op_mult(Segment_VELOCITY_radians, -1), "when calling new_Segment in Segment, line 59")
+		endif
 		call destructable_remove(d)
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
@@ -3415,6 +3554,59 @@ function bridge_code__Filter_ClosureForGroups takes nothing returns nothing
 	call code__Filter_ClosureForGroups("via function reference ClosureForGroups, line 14")
 endfunction
 
+function alloc_CallbackPeriodic_doPeriodically_addAction_Razor takes string w__wurst_stackPos returns integer
+	local integer this_1
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if CallbackPeriodic_firstFree == 0 then
+		if CallbackPeriodic_maxIndex < 32768 then
+			set CallbackPeriodic_maxIndex = CallbackPeriodic_maxIndex + 1
+			set this_1 = CallbackPeriodic_maxIndex
+			set CallbackPeriodic_typeId[this_1] = 648
+		else
+			call error("Out of memory: Could not create CallbackPeriodic_doPeriodically_addAction_Razor.", "when calling error in Razor, line 94")
+			set this_1 = 0
+		endif
+	else
+		set CallbackPeriodic_firstFree = CallbackPeriodic_firstFree - 1
+		set this_1 = CallbackPeriodic_nextFree[CallbackPeriodic_firstFree]
+		set CallbackPeriodic_typeId[this_1] = 648
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+	return this_1
+endfunction
+
+function trigger_disable takes trigger this_1 returns nothing
+	call DisableTrigger(this_1)
+endfunction
+
+function code__addAction_Razor takes string w__wurst_stackPos returns nothing
+	local integer choice_1
+	local integer cond_result
+	local integer clVar
+	local real temp
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	call trigger_disable(GetTriggeringTrigger())
+	if GetRandomInt(0, 1) == 1 then
+		set cond_result = 1
+	else
+		set cond_result = -1
+	endif
+	set choice_1 = cond_result
+	set temp = GetRandomReal(3.5, 4.5)
+	set clVar = alloc_CallbackPeriodic_doPeriodically_addAction_Razor("when calling alloc_CallbackPeriodic_doPeriodically_addAction_Razor in Razor, line 94")
+	call construct_CallbackPeriodic(clVar)
+	set choice[clVar] = choice_1
+	call doPeriodically(temp, clVar, "when calling doPeriodically in Razor, line 94")
+	set wurst_stack_depth = wurst_stack_depth - 1
+endfunction
+
+function bridge_code__addAction_Razor takes nothing returns nothing
+	set wurst_stack_depth = 0
+	call code__addAction_Razor("via function reference Razor, line 91")
+endfunction
+
 function code__addAction_nullTimer_ClosureEvents takes string w__wurst_stackPos returns nothing
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
@@ -3434,7 +3626,7 @@ function code__addAction_nullTimer_ClosureEvents_552 takes string w__wurst_stack
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
-function bridge_code__addAction_nullTimer_ClosureEvents_501 takes nothing returns nothing
+function bridge_code__addAction_nullTimer_ClosureEvents_499 takes nothing returns nothing
 	set wurst_stack_depth = 0
 	call code__addAction_nullTimer_ClosureEvents_552("via function reference ClosureEvents, line 296")
 endfunction
@@ -3446,7 +3638,7 @@ function code__addAction_nullTimer_ClosureEvents_553 takes string w__wurst_stack
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
-function bridge_code__addAction_nullTimer_ClosureEvents_502 takes nothing returns nothing
+function bridge_code__addAction_nullTimer_ClosureEvents_500 takes nothing returns nothing
 	set wurst_stack_depth = 0
 	call code__addAction_nullTimer_ClosureEvents_553("via function reference ClosureEvents, line 297")
 endfunction
@@ -3467,7 +3659,7 @@ function alloc_UnitIndex takes string w__wurst_stackPos returns integer
 		if UnitIndex_maxIndex < 32768 then
 			set UnitIndex_maxIndex = UnitIndex_maxIndex + 1
 			set this_1 = UnitIndex_maxIndex
-			set UnitIndex_typeId[this_1] = 787
+			set UnitIndex_typeId[this_1] = 788
 		else
 			call error("Out of memory: Could not create UnitIndex.", "when calling error in UnitIndexer, line 172")
 			set this_1 = 0
@@ -3475,7 +3667,7 @@ function alloc_UnitIndex takes string w__wurst_stackPos returns integer
 	else
 		set UnitIndex_firstFree = UnitIndex_firstFree - 1
 		set this_1 = UnitIndex_nextFree[UnitIndex_firstFree]
-		set UnitIndex_typeId[this_1] = 787
+		set UnitIndex_typeId[this_1] = 788
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -3484,11 +3676,11 @@ endfunction
 function UnitIndex_init takes integer this_1 returns nothing
 endfunction
 
-function popUnit_880 takes nothing returns nothing
+function popUnit_878 takes nothing returns nothing
 	set UnitIndexer_tempUnitsCount = UnitIndexer_tempUnitsCount - 1
 endfunction
 
-function pushUnit_887 takes unit u returns nothing
+function pushUnit_885 takes unit u returns nothing
 	set UnitIndexer_tempUnits[UnitIndexer_tempUnitsCount] = u
 	set UnitIndexer_tempUnitsCount = UnitIndexer_tempUnitsCount + 1
 endfunction
@@ -3505,9 +3697,9 @@ function construct_UnitIndex takes integer this_1, unit whichUnit returns nothin
 	call UnitIndex_init(this_1)
 	set UnitIndex__unit[this_1] = whichUnit
 	call unit_setUserData(UnitIndex__unit[this_1], this_1)
-	call pushUnit_887(whichUnit)
+	call pushUnit_885(whichUnit)
 	call trigger_evaluate(UnitIndexer_onIndexTrigger)
-	call popUnit_880()
+	call popUnit_878()
 endfunction
 
 function new_UnitIndex takes unit whichUnit, string w__wurst_stackPos returns integer
@@ -3547,9 +3739,9 @@ function bridge_code__onEnter_UnitIndexer takes nothing returns nothing
 endfunction
 
 function UnitIndex_onDestroy takes integer this_1 returns nothing
-	call pushUnit_887(UnitIndex__unit[this_1])
+	call pushUnit_885(UnitIndex__unit[this_1])
 	call trigger_evaluate(UnitIndexer_onDeindexTrigger)
-	call popUnit_880()
+	call popUnit_878()
 	call unit_setUserData(UnitIndex__unit[this_1], 0)
 endfunction
 
@@ -3902,7 +4094,7 @@ function dispatch_HashMap_HashMap_HashMap_remove takes integer this_1, integer k
 			call error("Called HashMap.remove on invalid object.", "when calling error in HashMap, line 27")
 		endif
 	endif
-	if Table_typeId[this_1] <= 778 then
+	if Table_typeId[this_1] <= 779 then
 		call HashMap_remove(this_1, key, "when calling remove in HashMap, line 27")
 	else
 		call IterableMap_remove(this_1, key, "when calling remove in HashMap, line 27")
@@ -3984,7 +4176,7 @@ function dispatch_HashMap_HashMap_HashMap_put takes integer this_1, integer key,
 			call error("Called HashMap.put on invalid object.", "when calling error in HashMap, line 17")
 		endif
 	endif
-	if Table_typeId[this_1] <= 778 then
+	if Table_typeId[this_1] <= 779 then
 		call HashMap_put(this_1, key, value, "when calling put in HashMap, line 17")
 	else
 		call IterableMap_put(this_1, key, value, "when calling put in HashMap, line 17")
@@ -4310,7 +4502,7 @@ function alloc_CallbackSingle_doAfter_onCast_ShieldGenerator takes string w__wur
 		if CallbackSingle_maxIndex < 32768 then
 			set CallbackSingle_maxIndex = CallbackSingle_maxIndex + 1
 			set this_1 = CallbackSingle_maxIndex
-			set CallbackSingle_typeId[this_1] = 654
+			set CallbackSingle_typeId[this_1] = 655
 		else
 			call error("Out of memory: Could not create CallbackSingle_doAfter_onCast_ShieldGenerator.", "when calling error in ShieldGenerator, line 152")
 			set this_1 = 0
@@ -4318,7 +4510,7 @@ function alloc_CallbackSingle_doAfter_onCast_ShieldGenerator takes string w__wur
 	else
 		set CallbackSingle_firstFree = CallbackSingle_firstFree - 1
 		set this_1 = CallbackSingle_nextFree[CallbackSingle_firstFree]
-		set CallbackSingle_typeId[this_1] = 654
+		set CallbackSingle_typeId[this_1] = 655
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -4332,7 +4524,7 @@ function alloc_EventListener_add_onCast_ShieldGenerator takes string w__wurst_st
 		if EventListener_maxIndex < 32768 then
 			set EventListener_maxIndex = EventListener_maxIndex + 1
 			set this_1 = EventListener_maxIndex
-			set EventListener_typeId[this_1] = 668
+			set EventListener_typeId[this_1] = 669
 		else
 			call error("Out of memory: Could not create EventListener_add_onCast_ShieldGenerator.", "when calling error in ShieldGenerator, line 166")
 			set this_1 = 0
@@ -4340,7 +4532,7 @@ function alloc_EventListener_add_onCast_ShieldGenerator takes string w__wurst_st
 	else
 		set EventListener_firstFree = EventListener_firstFree - 1
 		set this_1 = EventListener_nextFree[EventListener_firstFree]
-		set EventListener_typeId[this_1] = 668
+		set EventListener_typeId[this_1] = 669
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -4374,7 +4566,7 @@ function alloc_Shield takes string w__wurst_stackPos returns integer
 		if Shield_maxIndex < 32768 then
 			set Shield_maxIndex = Shield_maxIndex + 1
 			set this_1 = Shield_maxIndex
-			set Shield_typeId[this_1] = 761
+			set Shield_typeId[this_1] = 762
 		else
 			call error("Out of memory: Could not create Shield.", "when calling error in ShieldGenerator, line 30")
 			set this_1 = 0
@@ -4382,7 +4574,7 @@ function alloc_Shield takes string w__wurst_stackPos returns integer
 	else
 		set Shield_firstFree = Shield_firstFree - 1
 		set this_1 = Shield_nextFree[Shield_firstFree]
-		set Shield_typeId[this_1] = 761
+		set Shield_typeId[this_1] = 762
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -4408,10 +4600,10 @@ endfunction
 
 function construct_Shield takes integer this_1, unit caster_1, real p1_x, real p1_y, real p1_z, real p2_x, real p2_y, real p2_z, real p3_x, real p3_y, real p3_z, real p4_x, real p4_y, real p4_z returns nothing
 	call Shield_init(this_1)
-	set Shield_l1[this_1] = addLightning_445(Lightning_LIGHTNING_DRAIN, false, p1_x, p1_y, p1_z, p2_x, p2_y, p2_z)
-	set Shield_l2[this_1] = addLightning_445(Lightning_LIGHTNING_DRAIN, false, p2_x, p2_y, p2_z, p3_x, p3_y, p3_z)
-	set Shield_l3[this_1] = addLightning_445(Lightning_LIGHTNING_DRAIN, false, p3_x, p3_y, p3_z, p4_x, p4_y, p4_z)
-	set Shield_l4[this_1] = addLightning_445(Lightning_LIGHTNING_DRAIN, false, p4_x, p4_y, p4_z, p1_x, p1_y, p1_z)
+	set Shield_l1[this_1] = addLightning_441(Lightning_LIGHTNING_DRAIN, false, p1_x, p1_y, p1_z, p2_x, p2_y, p2_z)
+	set Shield_l2[this_1] = addLightning_441(Lightning_LIGHTNING_DRAIN, false, p2_x, p2_y, p2_z, p3_x, p3_y, p3_z)
+	set Shield_l3[this_1] = addLightning_441(Lightning_LIGHTNING_DRAIN, false, p3_x, p3_y, p3_z, p4_x, p4_y, p4_z)
+	set Shield_l4[this_1] = addLightning_441(Lightning_LIGHTNING_DRAIN, false, p4_x, p4_y, p4_z, p1_x, p1_y, p1_z)
 endfunction
 
 function new_Shield takes unit caster_1, real p1_x, real p1_y, real p1_z, real p2_x, real p2_y, real p2_z, real p3_x, real p3_y, real p3_z, real p4_x, real p4_y, real p4_z, string w__wurst_stackPos returns integer
@@ -4468,6 +4660,13 @@ function unit_setFacing takes unit this_1, real a_radians returns nothing
 	call SetUnitFacing(this_1, angle_degrees(a_radians))
 endfunction
 
+function vec3_op_plus takes real this_x, real this_y, real this_z, real v_x, real v_y, real v_z returns real
+	set vec3_op_plus_return_x = this_x + v_x
+	set vec3_op_plus_return_y = this_y + v_y
+	set vec3_op_plus_return_z = this_z + v_z
+	return vec3_op_plus_return_x
+endfunction
+
 function Log_warn takes string msg returns nothing
 	call printLog(Player_localPlayer, 3, msg)
 endfunction
@@ -4518,8 +4717,8 @@ function fire_onCast_ShieldGenerator takes integer this_1, unit caster_1, string
 	local real axis_y
 	local real axis_z
 	local real angl_radians
-	local real pos_x
-	local real pos_y
+	local real pos_x_1
+	local real pos_y_1
 	local real pos_z
 	local real array points_x
 	local real array points_y
@@ -4617,8 +4816,8 @@ function fire_onCast_ShieldGenerator takes integer this_1, unit caster_1, string
 	set tuple_temp_4 = unit_getPos3Real(caster_1)
 	set tuple_temp_5 = unit_getPos3Real_return_y
 	set tuple_temp_6 = unit_getPos3Real_return_z
-	set pos_x = tuple_temp_4
-	set pos_y = tuple_temp_5
+	set pos_x_1 = tuple_temp_4
+	set pos_y_1 = tuple_temp_5
 	set pos_z = tuple_temp_6
 	set tuple_temp_7 = Vectors_ZERO3_x
 	set tuple_temp_8 = Vectors_ZERO3_y
@@ -4674,25 +4873,25 @@ function fire_onCast_ShieldGenerator takes integer this_1, unit caster_1, string
 	set points_x[1] = tuple_temp_28
 	set points_y[1] = tuple_temp_29
 	set points_z[1] = tuple_temp_30
-	set tuple_temp_31 = vec3_op_plus(vec3_rotate(points_x[0], points_y[0], points_z[0], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x, pos_y, pos_z)
+	set tuple_temp_31 = vec3_op_plus(vec3_rotate(points_x[0], points_y[0], points_z[0], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x_1, pos_y_1, pos_z)
 	set tuple_temp_32 = vec3_op_plus_return_y
 	set tuple_temp_33 = vec3_op_plus_return_z
 	set p1_x = tuple_temp_31
 	set p1_y = tuple_temp_32
 	set p1_z = tuple_temp_33
-	set tuple_temp_34 = vec3_op_plus(vec3_rotate(points_x[0], points_y[1], points_z[0], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x, pos_y, pos_z)
+	set tuple_temp_34 = vec3_op_plus(vec3_rotate(points_x[0], points_y[1], points_z[0], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x_1, pos_y_1, pos_z)
 	set tuple_temp_35 = vec3_op_plus_return_y
 	set tuple_temp_36 = vec3_op_plus_return_z
 	set p2_x = tuple_temp_34
 	set p2_y = tuple_temp_35
 	set p2_z = tuple_temp_36
-	set tuple_temp_37 = vec3_op_plus(vec3_rotate(points_x[1], points_y[1], points_z[1], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x, pos_y, pos_z)
+	set tuple_temp_37 = vec3_op_plus(vec3_rotate(points_x[1], points_y[1], points_z[1], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x_1, pos_y_1, pos_z)
 	set tuple_temp_38 = vec3_op_plus_return_y
 	set tuple_temp_39 = vec3_op_plus_return_z
 	set p3_x = tuple_temp_37
 	set p3_y = tuple_temp_38
 	set p3_z = tuple_temp_39
-	set tuple_temp_40 = vec3_op_plus(vec3_rotate(points_x[1], points_y[0], points_z[1], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x, pos_y, pos_z)
+	set tuple_temp_40 = vec3_op_plus(vec3_rotate(points_x[1], points_y[0], points_z[1], axis_x, axis_y, axis_z, angle_radians(angl_radians)), vec3_rotate_return_y, vec3_rotate_return_z, pos_x_1, pos_y_1, pos_z)
 	set tuple_temp_41 = vec3_op_plus_return_y
 	set tuple_temp_42 = vec3_op_plus_return_z
 	set p4_x = tuple_temp_40
@@ -4703,8 +4902,8 @@ function fire_onCast_ShieldGenerator takes integer this_1, unit caster_1, string
 	set temp_2 = EVENT_PLAYER_UNIT_SPELL_ENDCAST
 	set clVar_1 = alloc_EventListener_add_onCast_ShieldGenerator("when calling alloc_EventListener_add_onCast_ShieldGenerator in ShieldGenerator, line 166")
 	call construct_EventListener(clVar_1)
-	set id_482[clVar_1] = id_1
-	set caster_455[clVar_1] = caster_1
+	set id_479[clVar_1] = id_1
+	set caster_453[clVar_1] = caster_1
 	set shield[clVar_1] = shield_1
 	call EventListener_add(temp_2, clVar_1, "when calling add in ShieldGenerator, line 166")
 	set wurst_stack_depth = wurst_stack_depth - 1
@@ -4722,13 +4921,13 @@ function dispatch_OnCastListener_ClosureEvents_OnCastListener_fire takes integer
 			call error("Called OnCastListener.fire on invalid object.", "when calling error in ClosureEvents, line 56")
 		endif
 	endif
-	if OnCastListener_typeId[this_1] <= 747 then
-		if OnCastListener_typeId[this_1] <= 746 then
+	if OnCastListener_typeId[this_1] <= 748 then
+		if OnCastListener_typeId[this_1] <= 747 then
 			call OnCast_fire(this_1, caster_1)
 		else
 			call fire_onCast_ShieldGenerator(this_1, caster_1, "when calling fire_onCast_ShieldGenerator in ClosureEvents, line 56")
 		endif
-	elseif OnCastListener_typeId[this_1] <= 748 then
+	elseif OnCastListener_typeId[this_1] <= 749 then
 		call OnPointCast_fire(this_1, caster_1)
 	else
 		call OnUnitCast_fire(this_1, caster_1)
@@ -4797,11 +4996,11 @@ function call_doAfter_ClosureTimers takes integer this_1 returns nothing
 	set ClosureTimers_x = ClosureTimers_x + 50
 endfunction
 
-function call_doAfter_ClosureTimers_528 takes integer this_1 returns nothing
+function call_doAfter_ClosureTimers_526 takes integer this_1 returns nothing
 	set ClosureTimers_x = ClosureTimers_x * 2
 endfunction
 
-function call_doAfter_ClosureTimers_529 takes integer this_1 returns nothing
+function call_doAfter_ClosureTimers_527 takes integer this_1 returns nothing
 	set ClosureTimers_x = ClosureTimers_x / 2
 	call int_assertEquals(ClosureTimers_x, 250)
 endfunction
@@ -4812,8 +5011,8 @@ function player_select takes player this_1, unit u returns nothing
 	endif
 endfunction
 
-function player_setCameraTargetControllerNoZ takes player this_1, unit whichUnit, real offset_x, real offset_y, boolean inheritOrientation returns nothing
-	call SetCameraTargetControllerNoZForPlayer(this_1, whichUnit, offset_x, offset_y, inheritOrientation)
+function player_setCameraTargetControllerNoZ takes player this_1, unit whichUnit, real offset_x_1, real offset_y_1, boolean inheritOrientation returns nothing
+	call SetCameraTargetControllerNoZForPlayer(this_1, whichUnit, offset_x_1, offset_y_1, inheritOrientation)
 endfunction
 
 function timerdialog_destr takes timerdialog this_1 returns nothing
@@ -4824,8 +5023,8 @@ function unit_getOwner takes unit this_1 returns player
 	return GetOwningPlayer(this_1)
 endfunction
 
-function unit_revive takes unit this_1, real pos_x, real pos_y, boolean doEyecandy returns nothing
-	call ReviveHero(this_1, pos_x, pos_y, doEyecandy)
+function unit_revive takes unit this_1, real pos_x_1, real pos_y_1, boolean doEyecandy returns nothing
+	call ReviveHero(this_1, pos_x_1, pos_y_1, doEyecandy)
 endfunction
 
 function call_doAfter_add_Character takes integer this_1 returns nothing
@@ -4872,8 +5071,8 @@ function call_nullTimer_ClosureEvents takes integer this_1 returns nothing
 	local trigger receiver_8
 	local trigger receiver_9
 	call trigger_addAction(ClosureEvents_unitTrig, ref_function_bridge_code__addAction_nullTimer_ClosureEvents)
-	call trigger_addAction(ClosureEvents_leaveTrig, ref_function_bridge_code__addAction_nullTimer_ClosureEvents_510)
-	call trigger_addAction(ClosureEvents_keyTrig, ref_function_bridge_code__addAction_nullTimer_ClosureEvents_511)
+	call trigger_addAction(ClosureEvents_leaveTrig, ref_function_bridge_code__addAction_nullTimer_ClosureEvents_515)
+	call trigger_addAction(ClosureEvents_keyTrig, ref_function_bridge_code__addAction_nullTimer_ClosureEvents_516)
 	set i = 0
 	set temp = bj_MAX_PLAYERS - 1
 	loop
@@ -4901,7 +5100,7 @@ function call_nullTimer_ClosureEvents takes integer this_1 returns nothing
 		call trigger_registerPlayerChatEvent(receiver_9, Player_players[i], "", false)
 		set i = i + 1
 	endloop
-	call registerPlayerUnitEvent_911(EVENT_PLAYER_UNIT_SPELL_EFFECT, null, ref_function_bridge_code__registerPlayerUnitEvent_nullTimer_ClosureEvents, null)
+	call registerPlayerUnitEvent_909(EVENT_PLAYER_UNIT_SPELL_EFFECT, null, ref_function_bridge_code__registerPlayerUnitEvent_nullTimer_ClosureEvents, null)
 	set receiver = null
 	set receiver_1 = null
 	set receiver_2 = null
@@ -4918,12 +5117,12 @@ function group_destr takes group this_1 returns nothing
 	call DestroyGroup(this_1)
 endfunction
 
-function group_enumUnitsInRect_746 takes group this_1, rect rec, boolexpr filter returns nothing
+function group_enumUnitsInRect_745 takes group this_1, rect rec, boolexpr filter returns nothing
 	call GroupEnumUnitsInRect(this_1, rec, filter)
 endfunction
 
 function group_enumUnitsInRect takes group this_1, rect rec returns nothing
-	call group_enumUnitsInRect_746(this_1, rec, null)
+	call group_enumUnitsInRect_745(this_1, rec, null)
 endfunction
 
 function trigger_registerEnterRegion takes trigger this_1, region whichRegion, boolexpr filter returns event
@@ -4955,7 +5154,7 @@ function alloc_ForGroupCallback_forEachFrom_Preloader takes string w__wurst_stac
 		if ForGroupCallback_maxIndex < 32768 then
 			set ForGroupCallback_maxIndex = ForGroupCallback_maxIndex + 1
 			set this_1 = ForGroupCallback_maxIndex
-			set ForGroupCallback_typeId[this_1] = 673
+			set ForGroupCallback_typeId[this_1] = 674
 		else
 			call error("Out of memory: Could not create ForGroupCallback_forEachFrom_Preloader.", "when calling error in Preloader, line 48")
 			set this_1 = 0
@@ -4963,7 +5162,7 @@ function alloc_ForGroupCallback_forEachFrom_Preloader takes string w__wurst_stac
 	else
 		set ForGroupCallback_firstFree = ForGroupCallback_firstFree - 1
 		set this_1 = ForGroupCallback_nextFree[ForGroupCallback_firstFree]
-		set ForGroupCallback_typeId[this_1] = 673
+		set ForGroupCallback_typeId[this_1] = 674
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -5018,29 +5217,29 @@ function dispatch_CallbackSingle_ClosureTimers_CallbackSingle_call takes integer
 			call error("Called CallbackSingle.call on invalid object.", "when calling error in ClosureTimers, line 109")
 		endif
 	endif
-	if CallbackSingle_typeId[this_1] <= 653 then
-		if CallbackSingle_typeId[this_1] <= 651 then
-			if CallbackSingle_typeId[this_1] <= 650 then
-				if CallbackSingle_typeId[this_1] <= 649 then
+	if CallbackSingle_typeId[this_1] <= 654 then
+		if CallbackSingle_typeId[this_1] <= 652 then
+			if CallbackSingle_typeId[this_1] <= 651 then
+				if CallbackSingle_typeId[this_1] <= 650 then
 					call call_doAfter_Character(this_1)
 				else
 					call call_doAfter_ClosureTimers(this_1)
 				endif
 			else
-				call call_doAfter_ClosureTimers_528(this_1)
+				call call_doAfter_ClosureTimers_526(this_1)
 			endif
-		elseif CallbackSingle_typeId[this_1] <= 652 then
-			call call_doAfter_ClosureTimers_529(this_1)
+		elseif CallbackSingle_typeId[this_1] <= 653 then
+			call call_doAfter_ClosureTimers_527(this_1)
 		else
 			call call_doAfter_add_Character(this_1)
 		endif
-	elseif CallbackSingle_typeId[this_1] <= 655 then
-		if CallbackSingle_typeId[this_1] <= 654 then
+	elseif CallbackSingle_typeId[this_1] <= 656 then
+		if CallbackSingle_typeId[this_1] <= 655 then
 			call call_doAfter_onCast_ShieldGenerator(this_1)
 		else
 			call call_nullTimer_ClosureEvents(this_1)
 		endif
-	elseif CallbackSingle_typeId[this_1] <= 656 then
+	elseif CallbackSingle_typeId[this_1] <= 657 then
 		call call_nullTimer_OnUnitEnterLeave(this_1)
 	else
 		call call_nullTimer_Preloader(this_1, "when calling call_nullTimer_Preloader in ClosureTimers, line 109")
@@ -5173,7 +5372,7 @@ function alloc_CallbackSingle_doAfter_Character takes string w__wurst_stackPos r
 		if CallbackSingle_maxIndex < 32768 then
 			set CallbackSingle_maxIndex = CallbackSingle_maxIndex + 1
 			set this_1 = CallbackSingle_maxIndex
-			set CallbackSingle_typeId[this_1] = 649
+			set CallbackSingle_typeId[this_1] = 650
 		else
 			call error("Out of memory: Could not create CallbackSingle_doAfter_Character.", "when calling error in Character, line 48")
 			set this_1 = 0
@@ -5181,7 +5380,7 @@ function alloc_CallbackSingle_doAfter_Character takes string w__wurst_stackPos r
 	else
 		set CallbackSingle_firstFree = CallbackSingle_firstFree - 1
 		set this_1 = CallbackSingle_nextFree[CallbackSingle_firstFree]
-		set CallbackSingle_typeId[this_1] = 649
+		set CallbackSingle_typeId[this_1] = 650
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -5195,31 +5394,9 @@ function alloc_EventListener_add_Character takes string w__wurst_stackPos return
 		if EventListener_maxIndex < 32768 then
 			set EventListener_maxIndex = EventListener_maxIndex + 1
 			set this_1 = EventListener_maxIndex
-			set EventListener_typeId[this_1] = 664
-		else
-			call error("Out of memory: Could not create EventListener_add_Character.", "when calling error in Character, line 56")
-			set this_1 = 0
-		endif
-	else
-		set EventListener_firstFree = EventListener_firstFree - 1
-		set this_1 = EventListener_nextFree[EventListener_firstFree]
-		set EventListener_typeId[this_1] = 664
-	endif
-	set wurst_stack_depth = wurst_stack_depth - 1
-	return this_1
-endfunction
-
-function alloc_EventListener_add_Character_462 takes string w__wurst_stackPos returns integer
-	local integer this_1
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if EventListener_firstFree == 0 then
-		if EventListener_maxIndex < 32768 then
-			set EventListener_maxIndex = EventListener_maxIndex + 1
-			set this_1 = EventListener_maxIndex
 			set EventListener_typeId[this_1] = 665
 		else
-			call error("Out of memory: Could not create EventListener_add_Character.", "when calling error in Character, line 85")
+			call error("Out of memory: Could not create EventListener_add_Character.", "when calling error in Character, line 56")
 			set this_1 = 0
 		endif
 	else
@@ -5231,8 +5408,30 @@ function alloc_EventListener_add_Character_462 takes string w__wurst_stackPos re
 	return this_1
 endfunction
 
-function createUnit takes player p, integer unitId, real pos_x, real pos_y, real facing_radians returns unit
-	return CreateUnit(p, unitId, pos_x, pos_y, angle_degrees(facing_radians))
+function alloc_EventListener_add_Character_459 takes string w__wurst_stackPos returns integer
+	local integer this_1
+	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
+	set wurst_stack_depth = wurst_stack_depth + 1
+	if EventListener_firstFree == 0 then
+		if EventListener_maxIndex < 32768 then
+			set EventListener_maxIndex = EventListener_maxIndex + 1
+			set this_1 = EventListener_maxIndex
+			set EventListener_typeId[this_1] = 666
+		else
+			call error("Out of memory: Could not create EventListener_add_Character.", "when calling error in Character, line 85")
+			set this_1 = 0
+		endif
+	else
+		set EventListener_firstFree = EventListener_firstFree - 1
+		set this_1 = EventListener_nextFree[EventListener_firstFree]
+		set EventListener_typeId[this_1] = 666
+	endif
+	set wurst_stack_depth = wurst_stack_depth - 1
+	return this_1
+endfunction
+
+function createUnit takes player p, integer unitId, real pos_x_1, real pos_y_1, real facing_radians returns unit
+	return CreateUnit(p, unitId, pos_x_1, pos_y_1, angle_degrees(facing_radians))
 endfunction
 
 function ObjectDefinition_setInt takes string this_key, string modification, integer value returns nothing
@@ -5535,7 +5734,7 @@ function alloc_LLIterator takes string w__wurst_stackPos returns integer
 		if LLIterator_maxIndex < 32768 then
 			set LLIterator_maxIndex = LLIterator_maxIndex + 1
 			set this_1 = LLIterator_maxIndex
-			set LLIterator_typeId[this_1] = 732
+			set LLIterator_typeId[this_1] = 733
 		else
 			call error("Out of memory: Could not create LLIterator.", "when calling error in LinkedList, line 431")
 			set this_1 = 0
@@ -5543,7 +5742,7 @@ function alloc_LLIterator takes string w__wurst_stackPos returns integer
 	else
 		set LLIterator_firstFree = LLIterator_firstFree - 1
 		set this_1 = LLIterator_nextFree[LLIterator_firstFree]
-		set LLIterator_typeId[this_1] = 732
+		set LLIterator_typeId[this_1] = 733
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -5930,7 +6129,7 @@ function alloc_HeroPreset takes string w__wurst_stackPos returns integer
 		if W3UDefinition_maxIndex < 32768 then
 			set W3UDefinition_maxIndex = W3UDefinition_maxIndex + 1
 			set this_1 = W3UDefinition_maxIndex
-			set W3UDefinition_typeId[this_1] = 797
+			set W3UDefinition_typeId[this_1] = 798
 		else
 			call error("Out of memory: Could not create HeroPreset.", "when calling error in HeroPreset, line 7")
 			set this_1 = 0
@@ -5938,7 +6137,7 @@ function alloc_HeroPreset takes string w__wurst_stackPos returns integer
 	else
 		set W3UDefinition_firstFree = W3UDefinition_firstFree - 1
 		set this_1 = W3UDefinition_nextFree[W3UDefinition_firstFree]
-		set W3UDefinition_typeId[this_1] = 797
+		set W3UDefinition_typeId[this_1] = 798
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -5975,7 +6174,7 @@ function alloc_LinkedList takes string w__wurst_stackPos returns integer
 		if LinkedList_maxIndex < 32768 then
 			set LinkedList_maxIndex = LinkedList_maxIndex + 1
 			set this_1 = LinkedList_maxIndex
-			set LinkedList_typeId[this_1] = 735
+			set LinkedList_typeId[this_1] = 736
 		else
 			call error("Out of memory: Could not create LinkedList.", "when calling error in LinkedList, line 18")
 			set this_1 = 0
@@ -5983,7 +6182,7 @@ function alloc_LinkedList takes string w__wurst_stackPos returns integer
 	else
 		set LinkedList_firstFree = LinkedList_firstFree - 1
 		set this_1 = LinkedList_nextFree[LinkedList_firstFree]
-		set LinkedList_typeId[this_1] = 735
+		set LinkedList_typeId[this_1] = 736
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -6237,9 +6436,9 @@ function init_Character takes string w__wurst_stackPos returns boolean
 	set receiver_4 = CreateTrigger()
 	call trigger_registerRectEnterEventSource(receiver_4, gg_rct_Checkpoint, "when calling registerRectEnterEventSource in Character, line 78")
 	set receiver_5 = receiver_4
-	call trigger_addAction(receiver_5, ref_function_code__addAction_Character_538)
+	call trigger_addAction(receiver_5, ref_function_code__addAction_Character_543)
 	set temp_1 = ClosureEvents_EVENT_PLAYER_CHAT_FILTER
-	set clVar_2 = alloc_EventListener_add_Character_462("when calling alloc_EventListener_add_Character in Character, line 85")
+	set clVar_2 = alloc_EventListener_add_Character_459("when calling alloc_EventListener_add_Character in Character, line 85")
 	call construct_EventListener(clVar_2)
 	call EventListener_add(temp_1, clVar_2, "when calling add in Character, line 85")
 	set wurst_stack_depth = wurst_stack_depth - 1
@@ -6267,7 +6466,7 @@ function alloc_CallbackSingle_nullTimer_ClosureEvents takes string w__wurst_stac
 		if CallbackSingle_maxIndex < 32768 then
 			set CallbackSingle_maxIndex = CallbackSingle_maxIndex + 1
 			set this_1 = CallbackSingle_maxIndex
-			set CallbackSingle_typeId[this_1] = 655
+			set CallbackSingle_typeId[this_1] = 656
 		else
 			call error("Out of memory: Could not create CallbackSingle_nullTimer_ClosureEvents.", "when calling error in ClosureEvents, line 294")
 			set this_1 = 0
@@ -6275,7 +6474,7 @@ function alloc_CallbackSingle_nullTimer_ClosureEvents takes string w__wurst_stac
 	else
 		set CallbackSingle_firstFree = CallbackSingle_firstFree - 1
 		set this_1 = CallbackSingle_nextFree[CallbackSingle_firstFree]
-		set CallbackSingle_typeId[this_1] = 655
+		set CallbackSingle_typeId[this_1] = 656
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -6289,7 +6488,7 @@ function alloc_HashMap takes string w__wurst_stackPos returns integer
 		if Table_maxIndex < 32768 then
 			set Table_maxIndex = Table_maxIndex + 1
 			set this_1 = Table_maxIndex
-			set Table_typeId[this_1] = 778
+			set Table_typeId[this_1] = 779
 		else
 			call error("Out of memory: Could not create HashMap.", "when calling error in HashMap, line 8")
 			set this_1 = 0
@@ -6297,7 +6496,7 @@ function alloc_HashMap takes string w__wurst_stackPos returns integer
 	else
 		set Table_firstFree = Table_firstFree - 1
 		set this_1 = Table_nextFree[Table_firstFree]
-		set Table_typeId[this_1] = 778
+		set Table_typeId[this_1] = 779
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -6393,7 +6592,7 @@ function alloc_Table takes string w__wurst_stackPos returns integer
 		if Table_maxIndex < 32768 then
 			set Table_maxIndex = Table_maxIndex + 1
 			set this_1 = Table_maxIndex
-			set Table_typeId[this_1] = 777
+			set Table_typeId[this_1] = 778
 		else
 			call error("Out of memory: Could not create Table.", "when calling error in Table, line 7")
 			set this_1 = 0
@@ -6401,7 +6600,7 @@ function alloc_Table takes string w__wurst_stackPos returns integer
 	else
 		set Table_firstFree = Table_firstFree - 1
 		set this_1 = Table_nextFree[Table_firstFree]
-		set Table_typeId[this_1] = 777
+		set Table_typeId[this_1] = 778
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -6702,8 +6901,8 @@ function createFrame takes string typeName, string name, framehandle owner, stri
 	return createFrametempReturn
 endfunction
 
-function framehandle_setSize takes framehandle this_1, real width, real height returns nothing
-	call BlzFrameSetSize(this_1, width, height)
+function framehandle_setSize takes framehandle this_1, real width_1, real height returns nothing
+	call BlzFrameSetSize(this_1, width_1, height)
 endfunction
 
 function init_Framehandle takes string w__wurst_stackPos returns boolean
@@ -6757,7 +6956,7 @@ function alloc_Comparator_LinkedList takes string w__wurst_stackPos returns inte
 	return this_1
 endfunction
 
-function alloc_Comparator_LinkedList_460 takes string w__wurst_stackPos returns integer
+function alloc_Comparator_LinkedList_457 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
@@ -6785,7 +6984,7 @@ function init_LinkedList takes string w__wurst_stackPos returns boolean
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	call alloc_Comparator_LinkedList("when calling alloc_Comparator_LinkedList in LinkedList, line 539")
-	call alloc_Comparator_LinkedList_460("when calling alloc_Comparator_LinkedList in LinkedList, line 543")
+	call alloc_Comparator_LinkedList_457("when calling alloc_Comparator_LinkedList in LinkedList, line 543")
 	call realToIndex(0.)
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return true
@@ -6949,7 +7148,7 @@ function alloc_CallbackSingle_nullTimer_OnUnitEnterLeave takes string w__wurst_s
 		if CallbackSingle_maxIndex < 32768 then
 			set CallbackSingle_maxIndex = CallbackSingle_maxIndex + 1
 			set this_1 = CallbackSingle_maxIndex
-			set CallbackSingle_typeId[this_1] = 656
+			set CallbackSingle_typeId[this_1] = 657
 		else
 			call error("Out of memory: Could not create CallbackSingle_nullTimer_OnUnitEnterLeave.", "when calling error in OnUnitEnterLeave, line 64")
 			set this_1 = 0
@@ -6957,7 +7156,7 @@ function alloc_CallbackSingle_nullTimer_OnUnitEnterLeave takes string w__wurst_s
 	else
 		set CallbackSingle_firstFree = CallbackSingle_firstFree - 1
 		set this_1 = CallbackSingle_nextFree[CallbackSingle_firstFree]
-		set CallbackSingle_typeId[this_1] = 656
+		set CallbackSingle_typeId[this_1] = 657
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7004,7 +7203,7 @@ function alloc_CallbackSingle_nullTimer_Preloader takes string w__wurst_stackPos
 		if CallbackSingle_maxIndex < 32768 then
 			set CallbackSingle_maxIndex = CallbackSingle_maxIndex + 1
 			set this_1 = CallbackSingle_maxIndex
-			set CallbackSingle_typeId[this_1] = 657
+			set CallbackSingle_typeId[this_1] = 658
 		else
 			call error("Out of memory: Could not create CallbackSingle_nullTimer_Preloader.", "when calling error in Preloader, line 58")
 			set this_1 = 0
@@ -7012,7 +7211,7 @@ function alloc_CallbackSingle_nullTimer_Preloader takes string w__wurst_stackPos
 	else
 		set CallbackSingle_firstFree = CallbackSingle_firstFree - 1
 		set this_1 = CallbackSingle_nextFree[CallbackSingle_firstFree]
-		set CallbackSingle_typeId[this_1] = 657
+		set CallbackSingle_typeId[this_1] = 658
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7047,96 +7246,21 @@ function bridge_init_Preloader takes nothing returns boolean
 	return init_Preloader("via function reference Preloader, line 1")
 endfunction
 
-function alloc_CallbackPeriodic_doPeriodically_Razor takes string w__wurst_stackPos returns integer
+function alloc_BackIterator_443 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	if CallbackPeriodic_firstFree == 0 then
-		if CallbackPeriodic_maxIndex < 32768 then
-			set CallbackPeriodic_maxIndex = CallbackPeriodic_maxIndex + 1
-			set this_1 = CallbackPeriodic_maxIndex
-			set CallbackPeriodic_typeId[this_1] = 646
-		else
-			call error("Out of memory: Could not create CallbackPeriodic_doPeriodically_Razor.", "when calling error in Razor, line 83")
-			set this_1 = 0
-		endif
-	else
-		set CallbackPeriodic_firstFree = CallbackPeriodic_firstFree - 1
-		set this_1 = CallbackPeriodic_nextFree[CallbackPeriodic_firstFree]
-		set CallbackPeriodic_typeId[this_1] = 646
-	endif
-	set wurst_stack_depth = wurst_stack_depth - 1
-	return this_1
-endfunction
-
-function CallbackPeriodic_init takes integer this_1 returns nothing
-endfunction
-
-function construct_CallbackPeriodic takes integer this_1 returns nothing
-	call CallbackPeriodic_init(this_1)
-endfunction
-
-function CallbackPeriodic_start takes integer this_1, timer whichTimer, real time, string w__wurst_stackPos returns nothing
-	local timer receiver
-	local timer receiver_1
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	set receiver = whichTimer
-	call timer_setData(receiver, this_1, "when calling setData in ClosureTimers, line 134")
-	set receiver_1 = receiver
-	call timer_startPeriodic(receiver_1, time, ref_function_bridge_CallbackPeriodic_staticCallback)
-	set CallbackPeriodic_t[this_1] = receiver_1
-	set wurst_stack_depth = wurst_stack_depth - 1
-	set receiver = null
-	set receiver_1 = null
-endfunction
-
-function dispatch_CallbackPeriodic_ClosureTimers_CallbackPeriodic_start takes integer this_1, timer whichTimer, real time, string w__wurst_stackPos returns nothing
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if CallbackPeriodic_typeId[this_1] == 0 then
-		if this_1 == 0 then
-			call error("Nullpointer exception when calling CallbackPeriodic.start", "when calling error in ClosureTimers, line 132")
-		else
-			call error("Called CallbackPeriodic.start on invalid object.", "when calling error in ClosureTimers, line 132")
-		endif
-	endif
-	call CallbackPeriodic_start(this_1, whichTimer, time, "when calling start in ClosureTimers, line 132")
-	set wurst_stack_depth = wurst_stack_depth - 1
-endfunction
-
-function timer_doPeriodically takes timer this_1, real time, integer cb, string w__wurst_stackPos returns integer
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	call dispatch_CallbackPeriodic_ClosureTimers_CallbackPeriodic_start(cb, this_1, time, "when calling start in ClosureTimers, line 45")
-	set wurst_stack_depth = wurst_stack_depth - 1
-	return cb
-endfunction
-
-function doPeriodically takes real time, integer cb, string w__wurst_stackPos returns integer
-	local integer stackTrace_tempReturn
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	set stackTrace_tempReturn = timer_doPeriodically(getTimer("when calling getTimer in ClosureTimers, line 57"), time, cb, "when calling doPeriodically in ClosureTimers, line 57")
-	set wurst_stack_depth = wurst_stack_depth - 1
-	return stackTrace_tempReturn
-endfunction
-
-function alloc_BackIterator_447 takes string w__wurst_stackPos returns integer
-	local integer this_1
-	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
-	set wurst_stack_depth = wurst_stack_depth + 1
-	if BackIterator_firstFree_7 == 0 then
-		if BackIterator_maxIndex_11 < 32768 then
-			set BackIterator_maxIndex_11 = BackIterator_maxIndex_11 + 1
-			set this_1 = BackIterator_maxIndex_11
+	if BackIterator_firstFree_8 == 0 then
+		if BackIterator_maxIndex_12 < 32768 then
+			set BackIterator_maxIndex_12 = BackIterator_maxIndex_12 + 1
+			set this_1 = BackIterator_maxIndex_12
 		else
 			call error("Out of memory: Could not create BackIterator.", "when calling error in LinkedListModule, line 93")
 			set this_1 = 0
 		endif
 	else
-		set BackIterator_firstFree_7 = BackIterator_firstFree_7 - 1
-		set this_1 = BackIterator_nextFree_15[BackIterator_firstFree_7]
+		set BackIterator_firstFree_8 = BackIterator_firstFree_8 - 1
+		set this_1 = BackIterator_nextFree_16[BackIterator_firstFree_8]
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7149,31 +7273,31 @@ function construct_BackIterator_566 takes integer this_1, boolean destroyOnClose
 	call BackIterator_init_7(this_1)
 endfunction
 
-function new_BackIterator_843 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
+function new_BackIterator_841 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_BackIterator_447("when calling alloc_BackIterator in LinkedListModule, line 97")
+	set this_1 = alloc_BackIterator_443("when calling alloc_BackIterator in LinkedListModule, line 97")
 	call construct_BackIterator_566(this_1, destroyOnClose)
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
-function alloc_Iterator_474 takes string w__wurst_stackPos returns integer
+function alloc_Iterator_471 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	if Iterator_firstFree_160 == 0 then
-		if Iterator_maxIndex_164 < 32768 then
-			set Iterator_maxIndex_164 = Iterator_maxIndex_164 + 1
-			set this_1 = Iterator_maxIndex_164
+	if Iterator_firstFree_161 == 0 then
+		if Iterator_maxIndex_165 < 32768 then
+			set Iterator_maxIndex_165 = Iterator_maxIndex_165 + 1
+			set this_1 = Iterator_maxIndex_165
 		else
 			call error("Out of memory: Could not create Iterator.", "when calling error in LinkedListModule, line 71")
 			set this_1 = 0
 		endif
 	else
-		set Iterator_firstFree_160 = Iterator_firstFree_160 - 1
-		set this_1 = Iterator_nextFree_168[Iterator_firstFree_160]
+		set Iterator_firstFree_161 = Iterator_firstFree_161 - 1
+		set this_1 = Iterator_nextFree_169[Iterator_firstFree_161]
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7186,21 +7310,24 @@ function construct_Iterator_578 takes integer this_1, boolean destroyOnClose ret
 	call Iterator_init_247(this_1)
 endfunction
 
-function new_Iterator_850 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
+function new_Iterator_848 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_Iterator_474("when calling alloc_Iterator in LinkedListModule, line 75")
+	set this_1 = alloc_Iterator_471("when calling alloc_Iterator in LinkedListModule, line 75")
 	call construct_Iterator_578(this_1, destroyOnClose)
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
+function region_addRect takes region this_1, rect rct returns nothing
+	call RegionAddRect(this_1, rct)
+endfunction
+
 function init_Razor takes string w__wurst_stackPos returns boolean
-	local integer choice_1
-	local integer cond_result
-	local integer clVar
-	local real temp
+	local region razorActivationReg
+	local trigger receiver
+	local trigger receiver_1
 	local real tuple_temp
 	local real tuple_temp_1
 	local real tuple_temp_2
@@ -7217,23 +7344,22 @@ function init_Razor takes string w__wurst_stackPos returns boolean
 	set Razor_FINISH_POS_y = tuple_temp_3
 	set Razor_WIDTH = 1500.
 	set Razor_SPEED = 750.
+	set Razor_RAZOR_ACTIVATION_RECT = gg_rct_RazorActivation
 	set Razor_LinkedListModule_first = 0
 	set Razor_LinkedListModule_last = 0
 	set Razor_LinkedListModule_size = 0
-	call new_Iterator_850(false, "when calling new_Iterator in LinkedListModule, line 55")
-	call new_BackIterator_843(false, "when calling new_BackIterator in LinkedListModule, line 65")
-	if GetRandomInt(0, 1) == 1 then
-		set cond_result = 1
-	else
-		set cond_result = -1
-	endif
-	set choice_1 = cond_result
-	set temp = GetRandomReal(3.5, 4.5)
-	set clVar = alloc_CallbackPeriodic_doPeriodically_Razor("when calling alloc_CallbackPeriodic_doPeriodically_Razor in Razor, line 83")
-	call construct_CallbackPeriodic(clVar)
-	set choice[clVar] = choice_1
-	call doPeriodically(temp, clVar, "when calling doPeriodically in Razor, line 83")
+	call new_Iterator_848(false, "when calling new_Iterator in LinkedListModule, line 55")
+	call new_BackIterator_841(false, "when calling new_BackIterator in LinkedListModule, line 65")
+	set razorActivationReg = CreateRegion()
+	call region_addRect(razorActivationReg, Razor_RAZOR_ACTIVATION_RECT)
+	set receiver = CreateTrigger()
+	call trigger_registerEnterRegion(receiver, razorActivationReg, null)
+	set receiver_1 = receiver
+	call trigger_addAction(receiver_1, ref_function_bridge_code__addAction_Razor)
 	set wurst_stack_depth = wurst_stack_depth - 1
+	set razorActivationReg = null
+	set receiver = null
+	set receiver_1 = null
 	return true
 endfunction
 
@@ -7264,15 +7390,15 @@ function alloc_ForGroupCallbackD_forDestructablesInRect_Segment takes string w__
 		if ForGroupCallbackD_maxIndex < 32768 then
 			set ForGroupCallbackD_maxIndex = ForGroupCallbackD_maxIndex + 1
 			set this_1 = ForGroupCallbackD_maxIndex
-			set ForGroupCallbackD_typeId[this_1] = 677
+			set ForGroupCallbackD_typeId[this_1] = 678
 		else
-			call error("Out of memory: Could not create ForGroupCallbackD_forDestructablesInRect_Segment.", "when calling error in Segment, line 58")
+			call error("Out of memory: Could not create ForGroupCallbackD_forDestructablesInRect_Segment.", "when calling error in Segment, line 54")
 			set this_1 = 0
 		endif
 	else
 		set ForGroupCallbackD_firstFree = ForGroupCallbackD_firstFree - 1
 		set this_1 = ForGroupCallbackD_nextFree[ForGroupCallbackD_firstFree]
-		set ForGroupCallbackD_typeId[this_1] = 677
+		set ForGroupCallbackD_typeId[this_1] = 678
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7325,7 +7451,7 @@ function pushCallbackD takes integer c returns nothing
 	set ClosureForGroups_tempCallbacksDCount = ClosureForGroups_tempCallbacksDCount + 1
 endfunction
 
-function forDestructablesInRect_737 takes rect r, boolexpr filter, integer cb, string w__wurst_stackPos returns nothing
+function forDestructablesInRect_736 takes rect r, boolexpr filter, integer cb, string w__wurst_stackPos returns nothing
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
 	call pushCallbackD(cb)
@@ -7337,25 +7463,25 @@ endfunction
 function forDestructablesInRect takes rect r, integer cb, string w__wurst_stackPos returns nothing
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	call forDestructablesInRect_737(r, null, cb, "when calling forDestructablesInRect in ClosureForGroups, line 185")
+	call forDestructablesInRect_736(r, null, cb, "when calling forDestructablesInRect in ClosureForGroups, line 185")
 	set wurst_stack_depth = wurst_stack_depth - 1
 endfunction
 
-function alloc_BackIterator_448 takes string w__wurst_stackPos returns integer
+function alloc_BackIterator_444 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	if BackIterator_firstFree_8 == 0 then
-		if BackIterator_maxIndex_12 < 32768 then
-			set BackIterator_maxIndex_12 = BackIterator_maxIndex_12 + 1
-			set this_1 = BackIterator_maxIndex_12
+	if BackIterator_firstFree_9 == 0 then
+		if BackIterator_maxIndex_13 < 32768 then
+			set BackIterator_maxIndex_13 = BackIterator_maxIndex_13 + 1
+			set this_1 = BackIterator_maxIndex_13
 		else
 			call error("Out of memory: Could not create BackIterator.", "when calling error in LinkedListModule, line 93")
 			set this_1 = 0
 		endif
 	else
-		set BackIterator_firstFree_8 = BackIterator_firstFree_8 - 1
-		set this_1 = BackIterator_nextFree_16[BackIterator_firstFree_8]
+		set BackIterator_firstFree_9 = BackIterator_firstFree_9 - 1
+		set this_1 = BackIterator_nextFree_17[BackIterator_firstFree_9]
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7368,44 +7494,36 @@ function construct_BackIterator_567 takes integer this_1, boolean destroyOnClose
 	call BackIterator_init_8(this_1)
 endfunction
 
-function new_BackIterator_844 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
+function new_BackIterator_842 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_BackIterator_448("when calling alloc_BackIterator in LinkedListModule, line 97")
+	set this_1 = alloc_BackIterator_444("when calling alloc_BackIterator in LinkedListModule, line 97")
 	call construct_BackIterator_567(this_1, destroyOnClose)
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
 function init_Segment takes string w__wurst_stackPos returns boolean
-	local timer receiver
-	local real angularVelocity_radians_1
 	local integer clVar
 	local rect temp
 	local real tuple_temp
-	local real tuple_temp_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
+	set Segment_LIGHTNING_TYPE = Lightning_LIGHTNING_DRAIN
+	set Segment_UNIT_HIT_FX = Abilities_greenDragonMissile
+	set tuple_temp = Maths_PI / 2.
+	set Segment_VELOCITY_radians = tuple_temp
+	set Segment_WIDTH = 380.
 	set Segment_LinkedListModule_first = 0
 	set Segment_LinkedListModule_last = 0
 	set Segment_LinkedListModule_size = 0
-	call new_Iterator_851(false, "when calling new_Iterator in LinkedListModule, line 55")
-	call new_BackIterator_844(false, "when calling new_BackIterator in LinkedListModule, line 65")
-	set Segment_lightType = Lightning_LIGHTNING_DRAIN
-	set Segment_touchEffect = "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdl"
-	set receiver = CreateTimer()
-	call timer_startPeriodic(receiver, 0.02, ref_function_bridge_Segment_updateAll)
-	set Segment_clock = receiver
-	set tuple_temp = real_asAngleDegrees(45.)
-	set angularVelocity_radians_1 = tuple_temp
+	call new_Iterator_849(false, "when calling new_Iterator in LinkedListModule, line 55")
+	call new_BackIterator_842(false, "when calling new_BackIterator in LinkedListModule, line 65")
 	set temp = MapBounds_playableMapRect
-	set clVar = alloc_ForGroupCallbackD_forDestructablesInRect_Segment("when calling alloc_ForGroupCallbackD_forDestructablesInRect_Segment in Segment, line 58")
-	set tuple_temp_1 = angularVelocity_radians_1
-	set angularVelocity_radians[clVar] = tuple_temp_1
-	call forDestructablesInRect(temp, clVar, "when calling forDestructablesInRect in Segment, line 58")
+	set clVar = alloc_ForGroupCallbackD_forDestructablesInRect_Segment("when calling alloc_ForGroupCallbackD_forDestructablesInRect_Segment in Segment, line 54")
+	call forDestructablesInRect(temp, clVar, "when calling forDestructablesInRect in Segment, line 54")
 	set wurst_stack_depth = wurst_stack_depth - 1
-	set receiver = null
 	set temp = null
 	return true
 endfunction
@@ -7454,7 +7572,7 @@ function alloc_EventListener_add_ShieldGenerator takes string w__wurst_stackPos 
 		if EventListener_maxIndex < 32768 then
 			set EventListener_maxIndex = EventListener_maxIndex + 1
 			set this_1 = EventListener_maxIndex
-			set EventListener_typeId[this_1] = 666
+			set EventListener_typeId[this_1] = 667
 		else
 			call error("Out of memory: Could not create EventListener_add_ShieldGenerator.", "when calling error in ShieldGenerator, line 140")
 			set this_1 = 0
@@ -7462,13 +7580,13 @@ function alloc_EventListener_add_ShieldGenerator takes string w__wurst_stackPos 
 	else
 		set EventListener_firstFree = EventListener_firstFree - 1
 		set this_1 = EventListener_nextFree[EventListener_firstFree]
-		set EventListener_typeId[this_1] = 666
+		set EventListener_typeId[this_1] = 667
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
-function alloc_EventListener_add_ShieldGenerator_464 takes string w__wurst_stackPos returns integer
+function alloc_EventListener_add_ShieldGenerator_461 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
@@ -7476,7 +7594,7 @@ function alloc_EventListener_add_ShieldGenerator_464 takes string w__wurst_stack
 		if EventListener_maxIndex < 32768 then
 			set EventListener_maxIndex = EventListener_maxIndex + 1
 			set this_1 = EventListener_maxIndex
-			set EventListener_typeId[this_1] = 667
+			set EventListener_typeId[this_1] = 668
 		else
 			call error("Out of memory: Could not create EventListener_add_ShieldGenerator.", "when calling error in ShieldGenerator, line 144")
 			set this_1 = 0
@@ -7484,7 +7602,7 @@ function alloc_EventListener_add_ShieldGenerator_464 takes string w__wurst_stack
 	else
 		set EventListener_firstFree = EventListener_firstFree - 1
 		set this_1 = EventListener_nextFree[EventListener_firstFree]
-		set EventListener_typeId[this_1] = 667
+		set EventListener_typeId[this_1] = 668
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7498,7 +7616,7 @@ function alloc_OnCastListener_onCast_ShieldGenerator takes string w__wurst_stack
 		if OnCastListener_maxIndex < 32768 then
 			set OnCastListener_maxIndex = OnCastListener_maxIndex + 1
 			set this_1 = OnCastListener_maxIndex
-			set OnCastListener_typeId[this_1] = 747
+			set OnCastListener_typeId[this_1] = 748
 		else
 			call error("Out of memory: Could not create OnCastListener_onCast_ShieldGenerator.", "when calling error in ShieldGenerator, line 149")
 			set this_1 = 0
@@ -7506,7 +7624,7 @@ function alloc_OnCastListener_onCast_ShieldGenerator takes string w__wurst_stack
 	else
 		set OnCastListener_firstFree = OnCastListener_firstFree - 1
 		set this_1 = OnCastListener_nextFree[OnCastListener_firstFree]
-		set OnCastListener_typeId[this_1] = 747
+		set OnCastListener_typeId[this_1] = 748
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7522,29 +7640,36 @@ function construct_OnCastListener takes integer this_1 returns nothing
 	call OnCastListener_init(this_1)
 endfunction
 
-function createItem_601 takes integer itemId, real pos_x, real pos_y, real pos_z returns item
-	return CreateItem(itemId, pos_x, pos_y)
+function createItem_601 takes integer itemId, real pos_x_1, real pos_y_1, real pos_z returns item
+	return CreateItem(itemId, pos_x_1, pos_y_1)
 endfunction
 
-function createItem takes integer itemId, real pos_x, real pos_y returns item
-	return createItem_601(itemId, vec2_toVec3(pos_x, pos_y), vec2_toVec3_return_y, vec2_toVec3_return_z)
+function vec2_toVec3 takes real this_x, real this_y returns real
+	set vec2_toVec3_return_x = this_x
+	set vec2_toVec3_return_y = this_y
+	set vec2_toVec3_return_z = 0.
+	return vec2_toVec3_return_x
 endfunction
 
-function alloc_BackIterator_449 takes string w__wurst_stackPos returns integer
+function createItem takes integer itemId, real pos_x_1, real pos_y_1 returns item
+	return createItem_601(itemId, vec2_toVec3(pos_x_1, pos_y_1), vec2_toVec3_return_y, vec2_toVec3_return_z)
+endfunction
+
+function alloc_BackIterator_445 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	if BackIterator_firstFree_9 == 0 then
-		if BackIterator_maxIndex_13 < 32768 then
-			set BackIterator_maxIndex_13 = BackIterator_maxIndex_13 + 1
-			set this_1 = BackIterator_maxIndex_13
+	if BackIterator_firstFree_10 == 0 then
+		if BackIterator_maxIndex_14 < 32768 then
+			set BackIterator_maxIndex_14 = BackIterator_maxIndex_14 + 1
+			set this_1 = BackIterator_maxIndex_14
 		else
 			call error("Out of memory: Could not create BackIterator.", "when calling error in LinkedListModule, line 93")
 			set this_1 = 0
 		endif
 	else
-		set BackIterator_firstFree_9 = BackIterator_firstFree_9 - 1
-		set this_1 = BackIterator_nextFree_17[BackIterator_firstFree_9]
+		set BackIterator_firstFree_10 = BackIterator_firstFree_10 - 1
+		set this_1 = BackIterator_nextFree_18[BackIterator_firstFree_10]
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7557,31 +7682,31 @@ function construct_BackIterator_568 takes integer this_1, boolean destroyOnClose
 	call BackIterator_init_9(this_1)
 endfunction
 
-function new_BackIterator_845 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
+function new_BackIterator_843 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_BackIterator_449("when calling alloc_BackIterator in LinkedListModule, line 97")
+	set this_1 = alloc_BackIterator_445("when calling alloc_BackIterator in LinkedListModule, line 97")
 	call construct_BackIterator_568(this_1, destroyOnClose)
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
 endfunction
 
-function alloc_Iterator_476 takes string w__wurst_stackPos returns integer
+function alloc_Iterator_473 takes string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	if Iterator_firstFree_162 == 0 then
-		if Iterator_maxIndex_166 < 32768 then
-			set Iterator_maxIndex_166 = Iterator_maxIndex_166 + 1
-			set this_1 = Iterator_maxIndex_166
+	if Iterator_firstFree_163 == 0 then
+		if Iterator_maxIndex_167 < 32768 then
+			set Iterator_maxIndex_167 = Iterator_maxIndex_167 + 1
+			set this_1 = Iterator_maxIndex_167
 		else
 			call error("Out of memory: Could not create Iterator.", "when calling error in LinkedListModule, line 71")
 			set this_1 = 0
 		endif
 	else
-		set Iterator_firstFree_162 = Iterator_firstFree_162 - 1
-		set this_1 = Iterator_nextFree_170[Iterator_firstFree_162]
+		set Iterator_firstFree_163 = Iterator_firstFree_163 - 1
+		set this_1 = Iterator_nextFree_171[Iterator_firstFree_163]
 	endif
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7594,11 +7719,11 @@ function construct_Iterator_580 takes integer this_1, boolean destroyOnClose ret
 	call Iterator_init_249(this_1)
 endfunction
 
-function new_Iterator_852 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
+function new_Iterator_850 takes boolean destroyOnClose, string w__wurst_stackPos returns integer
 	local integer this_1
 	set wurst_stack[wurst_stack_depth] = w__wurst_stackPos
 	set wurst_stack_depth = wurst_stack_depth + 1
-	set this_1 = alloc_Iterator_476("when calling alloc_Iterator in LinkedListModule, line 75")
+	set this_1 = alloc_Iterator_473("when calling alloc_Iterator in LinkedListModule, line 75")
 	call construct_Iterator_580(this_1, destroyOnClose)
 	set wurst_stack_depth = wurst_stack_depth - 1
 	return this_1
@@ -7656,15 +7781,15 @@ function init_ShieldGenerator takes string w__wurst_stackPos returns boolean
 	set Shield_LinkedListModule_first = 0
 	set Shield_LinkedListModule_last = 0
 	set Shield_LinkedListModule_size = 0
-	call new_Iterator_852(false, "when calling new_Iterator in LinkedListModule, line 55")
-	call new_BackIterator_845(false, "when calling new_BackIterator in LinkedListModule, line 65")
+	call new_Iterator_850(false, "when calling new_Iterator in LinkedListModule, line 55")
+	call new_BackIterator_843(false, "when calling new_BackIterator in LinkedListModule, line 65")
 	call createItem(ShieldGenerator_ITEM_ID, rect_getCenter(gg_rct_ShieldGeneratorSpawn), rect_getCenter_return_y)
 	set temp = EVENT_PLAYER_UNIT_PICKUP_ITEM
 	set clVar = alloc_EventListener_add_ShieldGenerator("when calling alloc_EventListener_add_ShieldGenerator in ShieldGenerator, line 140")
 	call construct_EventListener(clVar)
 	call EventListener_add(temp, clVar, "when calling add in ShieldGenerator, line 140")
 	set temp_1 = EVENT_PLAYER_UNIT_DROP_ITEM
-	set clVar_1 = alloc_EventListener_add_ShieldGenerator_464("when calling alloc_EventListener_add_ShieldGenerator in ShieldGenerator, line 144")
+	set clVar_1 = alloc_EventListener_add_ShieldGenerator_461("when calling alloc_EventListener_add_ShieldGenerator in ShieldGenerator, line 144")
 	call construct_EventListener(clVar_1)
 	call EventListener_add(temp_1, clVar_1, "when calling add in ShieldGenerator, line 144")
 	set temp_2 = ShieldGenerator_FRONT_SHIELD_ID
@@ -7781,11 +7906,7 @@ function code__addAction_Character takes nothing returns nothing
 	call CustomVictoryBJ(GetLocalPlayer(), true, false)
 endfunction
 
-function trigger_disable takes trigger this_1 returns nothing
-	call DisableTrigger(this_1)
-endfunction
-
-function code__addAction_Character_550 takes nothing returns nothing
+function code__addAction_Character_549 takes nothing returns nothing
 	local real tuple_temp = rect_getCenter(gg_rct_Checkpoint)
 	local real tuple_temp_1 = rect_getCenter_return_y
 	set Character_checkpoint_x = tuple_temp
@@ -7832,6 +7953,7 @@ endfunction
 
 function init_Abilities takes nothing returns boolean
 	set Abilities_farseerMissile = "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx"
+	set Abilities_greenDragonMissile = "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx"
 	set Abilities_vengeanceMissile = "Abilities\\Weapons\\VengeanceMissile\\VengeanceMissile.mdx"
 	return true
 endfunction
@@ -7940,7 +8062,7 @@ endfunction
 function init_ErrorHandling takes nothing returns boolean
 	set ErrorHandling_MUTE_ERROR_DURATION = 60
 	set ErrorHandling_PRIMARY_ERROR_KEY = -1
-	set ErrorHandling_HT = hashtable_compiletime_479
+	set ErrorHandling_HT = hashtable_compiletime_476
 	set ErrorHandling_suppressErrorMessages = false
 	return true
 endfunction
@@ -7960,7 +8082,7 @@ endfunction
 
 function init_HashList takes nothing returns boolean
 	set HashList_ht = hashtable_compiletime
-	set HashList_occurences = hashtable_compiletime_478
+	set HashList_occurences = hashtable_compiletime_475
 	return true
 endfunction
 
@@ -8003,10 +8125,6 @@ endfunction
 
 function rect_getMinY takes rect this_1 returns real
 	return GetRectMinY(this_1)
-endfunction
-
-function region_addRect takes region this_1, rect rct returns nothing
-	call RegionAddRect(this_1, rct)
 endfunction
 
 function initMapBounds takes nothing returns nothing
@@ -8188,7 +8306,7 @@ function init_String takes nothing returns boolean
 endfunction
 
 function init_Table takes nothing returns boolean
-	set Table_ht = hashtable_compiletime_480
+	set Table_ht = hashtable_compiletime_477
 	return true
 endfunction
 
@@ -8259,6 +8377,7 @@ function initGlobals takes nothing returns nothing
 	set gg_rct_RazorStart = null
 	set gg_rct_RazorFinish = null
 	set gg_rct_ShieldGeneratorSpawn = null
+	set gg_rct_RazorActivation = null
 	set CallbackSingle_firstFree = 0
 	set CallbackSingle_maxIndex = 0
 	set EventListener_firstFree = 0
@@ -8295,22 +8414,22 @@ function initGlobals takes nothing returns nothing
 	set OrderStringFactory_maxIndex = 0
 	set Razor_firstFree = 0
 	set Razor_maxIndex = 0
-	set BackIterator_firstFree_7 = 0
-	set BackIterator_maxIndex_11 = 0
-	set Iterator_firstFree_160 = 0
-	set Iterator_maxIndex_164 = 0
-	set Segment_firstFree = 0
-	set Segment_maxIndex = 0
 	set BackIterator_firstFree_8 = 0
 	set BackIterator_maxIndex_12 = 0
 	set Iterator_firstFree_161 = 0
 	set Iterator_maxIndex_165 = 0
-	set Shield_firstFree = 0
-	set Shield_maxIndex = 0
+	set Segment_firstFree = 0
+	set Segment_maxIndex = 0
 	set BackIterator_firstFree_9 = 0
 	set BackIterator_maxIndex_13 = 0
 	set Iterator_firstFree_162 = 0
 	set Iterator_maxIndex_166 = 0
+	set Shield_firstFree = 0
+	set Shield_maxIndex = 0
+	set BackIterator_firstFree_10 = 0
+	set BackIterator_maxIndex_14 = 0
+	set Iterator_firstFree_163 = 0
+	set Iterator_maxIndex_167 = 0
 	set UnitIndex_firstFree = 0
 	set UnitIndex_maxIndex = 0
 	set ref_function_init_Abilities = function init_Abilities
@@ -8377,20 +8496,20 @@ function initGlobals takes nothing returns nothing
 	set ref_function_bridge_init_Razor = function bridge_init_Razor
 	set ref_function_bridge_init_ShieldGenerator = function bridge_init_ShieldGenerator
 	set ref_function_code__addAction_Character = function code__addAction_Character
-	set ref_function_code__addAction_Character_538 = function code__addAction_Character_550
+	set ref_function_code__addAction_Character_543 = function code__addAction_Character_549
 	set ref_function_code__onUnitIndex_ClosureEvents = function code__onUnitIndex_ClosureEvents
 	set ref_function_bridge_code__onUnitDeindex_ClosureEvents = function bridge_code__onUnitDeindex_ClosureEvents
 	set ref_function_bridge_EventListener_generalEventCallback = function bridge_EventListener_generalEventCallback
 	set ref_function_bridge_code__Filter_ClosureForGroups = function bridge_code__Filter_ClosureForGroups
 	set ref_function_bridge_code__EnumDestructablesInRect_ClosureForGroups = function bridge_code__EnumDestructablesInRect_ClosureForGroups
 	set ref_function_code__startPeriodic_GameTimer = function code__startPeriodic_GameTimer
+	set ref_function_bridge_code__addAction_Razor = function bridge_code__addAction_Razor
 	set ref_function_bridge_code__registerPlayerUnitEvent_RegisterEvents = function bridge_code__registerPlayerUnitEvent_RegisterEvents
-	set ref_function_bridge_Segment_updateAll = function bridge_Segment_updateAll
 	set ref_function_bridge_code__onEnter_UnitIndexer = function bridge_code__onEnter_UnitIndexer
 	set ref_function_bridge_code__onLeave_UnitIndexer = function bridge_code__onLeave_UnitIndexer
 	set ref_function_bridge_code__addAction_nullTimer_ClosureEvents = function bridge_code__addAction_nullTimer_ClosureEvents
-	set ref_function_bridge_code__addAction_nullTimer_ClosureEvents_510 = function bridge_code__addAction_nullTimer_ClosureEvents_501
-	set ref_function_bridge_code__addAction_nullTimer_ClosureEvents_511 = function bridge_code__addAction_nullTimer_ClosureEvents_502
+	set ref_function_bridge_code__addAction_nullTimer_ClosureEvents_515 = function bridge_code__addAction_nullTimer_ClosureEvents_499
+	set ref_function_bridge_code__addAction_nullTimer_ClosureEvents_516 = function bridge_code__addAction_nullTimer_ClosureEvents_500
 	set ref_function_bridge_code__registerPlayerUnitEvent_nullTimer_ClosureEvents = function bridge_code__registerPlayerUnitEvent_nullTimer_ClosureEvents
 	set ref_function_bridge_CallbackCounted_staticCallback = function bridge_CallbackCounted_staticCallback
 	set ref_function_bridge_CallbackPeriodic_staticCallback = function bridge_CallbackPeriodic_staticCallback

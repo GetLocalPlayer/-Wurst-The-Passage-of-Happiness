@@ -28,6 +28,7 @@ globals
     rect                    gg_rct_RazorStart          = null
     rect                    gg_rct_RazorFinish         = null
     rect                    gg_rct_ShieldGeneratorSpawn = null
+    rect                    gg_rct_RazorActivation     = null
 endglobals
 
 function InitGlobals takes nothing returns nothing
@@ -94,6 +95,7 @@ function CreateRegions takes nothing returns nothing
     set gg_rct_RazorStart = Rect( -2048.0, -2560.0, -1920.0, -2432.0 )
     set gg_rct_RazorFinish = Rect( 1792.0, -6400.0, 1920.0, -6272.0 )
     set gg_rct_ShieldGeneratorSpawn = Rect( -3392.0, -1376.0, -3264.0, -1248.0 )
+    set gg_rct_RazorActivation = Rect( -1024.0, -4544.0, -352.0, -3808.0 )
 endfunction
 
 //***************************************************************************
