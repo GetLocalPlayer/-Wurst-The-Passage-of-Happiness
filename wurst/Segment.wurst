@@ -10,6 +10,7 @@ import Raycast
 constant LIGHTNING_TYPE = LIGHTNING_DRAIN
 constant UNIT_HIT_FX = Abilities.greenDragonMissile
 constant VELOCITY = angle(PI/2)
+constant VELOCITY_RANDOM_RANGE = 15
 constant WIDTH = 380.
 
 
@@ -53,8 +54,9 @@ public class Segment
 init // Replace the barrels with segments
     forDestructablesInRect(playableMapRect) d -> 
         if d.getTypeId() == 'LTbr'
+            let randomVelocityOffset = GetRandomInt(-VELOCITY_RANDOM_RANGE, VELOCITY_RANDOM_RANGE).toReal().asAngleDegrees()
             if GetRandomInt(0, 1) == 0
-                new Segment(d.getPos(), WIDTH, VELOCITY)
+                new Segment(d.getPos(), WIDTH, VELOCITY + randomVelocityOffset)
             else
-                new Segment(d.getPos(), WIDTH, VELOCITY * (-1))
+                new Segment(d.getPos(), WIDTH, VELOCITY * (-1) + randomVelocityOffset)
             d.remove()
